@@ -1,0 +1,77 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "文旅平台",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/hiking/list",
+      "style": {
+        "navigationBarTitleText": "徒步线路"
+      }
+    },
+    {
+      "path": "pages/hiking/detail",
+      "style": {
+        "navigationBarTitleText": "线路详情"
+      }
+    },
+    {
+      "path": "pages/ticket/list",
+      "style": {
+        "navigationBarTitleText": "景区门票"
+      }
+    },
+    {
+      "path": "pages/ticket/detail",
+      "style": {
+        "navigationBarTitleText": "门票详情"
+      }
+    },
+    {
+      "path": "pages/hotel/list",
+      "style": {
+        "navigationBarTitleText": "酒店民宿"
+      }
+    },
+    {
+      "path": "pages/hotel/detail",
+      "style": {
+        "navigationBarTitleText": "酒店详情"
+      }
+    },
+    {
+      "path": "pages/cultural/list",
+      "style": {
+        "navigationBarTitleText": "文创周边"
+      }
+    },
+    {
+      "path": "pages/cultural/detail",
+      "style": {
+        "navigationBarTitleText": "商品详情"
+      }
+    },
+    {
+      "path": "pages/guide/list",
+      "style": {
+        "navigationBarTitleText": "游玩攻略"
+      }
+    },
+    {
+      "path": "pages/guide/detail",
+      "style": {
+        "navigationBarTitleText": "攻略详情"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "文旅平台",
+    "navigationBarBackgroundColor": "#1F2937",
+    "backgroundColor": "#F3F4F6"
+  }
+}
