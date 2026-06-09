@@ -9,7 +9,14 @@
       </view>
     </view>
 
-    <image class="hero" :src="item.cover" mode="aspectFill" @click="previewImg([item.cover])" />
+    <view class="hero-wrap">
+      <swiper class="hero-swiper" :indicator-dots="false" :autoplay="true" :interval="4000" :duration="500" :circular="true" @change="onSwipe">
+        <swiper-item v-for="(img, i) in heroImages" :key="i">
+          <image class="hero" :src="img" mode="aspectFill" @click="previewImg(heroImages, i)" />
+        </swiper-item>
+      </swiper>
+      <view class="hero-indicator">{{ heroIndex + 1 }}/{{ heroImages.length }}</view>
+    </view>
 
     <view class="head">
       <text class="title">{{ item.title }}</text>
@@ -90,16 +97,19 @@
 
     <!-- 住宿推荐 -->
     <view class="section" v-if="item.accommodation && item.accommodation.hotel">
-      <view class="bh"><text class="bh-num">4</text><text class="bh-title">住宿推荐与美食攻略</text></view>
+      <view class="bh"><text class="bh-num">4</text><text class="bh-title">{{ item.accommodation.title || '住宿推荐' }}与美食攻略</text></view>
       <view class="hotel-card">
-        <text class="hc-tag">住宿推荐</text>
-        <text class="hc-name">{{ item.accommodation.hotel.name }}</text>
-        <text class="hc-meta">⭐ {{ item.accommodation.hotel.rating }}</text>
-        <text class="hc-desc">{{ item.accommodation.hotel.desc }}</text>
-        <text class="hc-price">¥{{ item.accommodation.hotel.price }}</text>
+        <image v-if="item.accommodation.hotel.cover" class="hc-img" :src="item.accommodation.hotel.cover" mode="aspectFill" @click="previewImg([item.accommodation.hotel.cover])" />
+        <view class="hc-body">
+          <text class="hc-tag">{{ item.accommodation.title || '住宿推荐' }}</text>
+          <text class="hc-name">{{ item.accommodation.hotel.name }}</text>
+          <text class="hc-meta">⭐ {{ item.accommodation.hotel.rating }}</text>
+          <text class="hc-desc">{{ item.accommodation.hotel.desc }}</text>
+          <text class="hc-price">¥{{ item.accommodation.hotel.price }}</text>
+        </view>
       </view>
-      <text class="sub-title">必尝美食</text>
-      <view class="food-row">
+      <text v-if="item.foods && item.foods.length" class="sub-title">必尝美食</text>
+      <view class="food-row" v-if="item.foods && item.foods.length">
         <view class="food" v-for="(f, i) in item.foods" :key="i" :class="foodColor(i)">
           <text class="f-ic">{{ f.icon }}</text>
           <text class="f-name">{{ f.name }}</text>
@@ -149,7 +159,7 @@
 <script setup>
 import { guides, findById } from '@/common/data.js'
 import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const item = ref(null)
 const followed = ref(false)
@@ -158,11 +168,17 @@ const faved = ref(false)
 const likeCount = ref(0)
 const favCount = ref(0)
 const commentCount = ref(368)
+const heroIndex = ref(0)
+const heroImages = computed(() => {
+  if (!item.value) return []
+  if (item.value.images && item.value.images.length) return item.value.images
+  return [item.value.cover]
+})
 
 onLoad((q) => {
   item.value = findById(guides, q.id) || guides[0]
-  likeCount.value = item.value.likes || 0
-  favCount.value = item.value.favorites || item.value.likes || 0
+  likeCount.value = parseFloat(String(item.value.likes || '0')) || 0
+  favCount.value = parseFloat(String(item.value.favorites || item.value.likes || '0')) || 0
 })
 
 function tagClass (i) { return ['t-green', 't-blue', 't-pink', 't-purple'][i % 4] }
@@ -173,8 +189,9 @@ function onShare () { uni.showActionSheet({ itemList: ['微信好友','朋友圈
 function onMore () { uni.showActionSheet({ itemList: ['举报','投诉','复制链接'], success: () => uni.showToast({ title: '操作成功', icon: 'none' }) }) }
 function previewImg (urls, i = 0) { uni.previewImage({ urls, current: urls[i] }) }
 function toggleFollow () { followed.value = !followed.value; uni.showToast({ title: followed.value ? `已关注 ${item.value.author}` : '已取消关注', icon: 'none' }) }
-function toggleLike () { liked.value = !liked.value; likeCount.value += liked.value ? 1 : -1; uni.showToast({ title: liked.value ? '已点赞' : '取消点赞', icon: 'none' }) }
-function toggleFav () { faved.value = !faved.value; favCount.value += faved.value ? 1 : -1; uni.showToast({ title: faved.value ? '已收藏' : '取消收藏', icon: 'none' }) }
+function toggleLike () { liked.value = !liked.value; likeCount.value = +(likeCount.value + (liked.value ? 1 : -1)).toFixed(2); uni.showToast({ title: liked.value ? '已点赞' : '取消点赞', icon: 'none' }) }
+function toggleFav () { faved.value = !faved.value; favCount.value = +(favCount.value + (faved.value ? 1 : -1)).toFixed(2); uni.showToast({ title: faved.value ? '已收藏' : '取消收藏', icon: 'none' }) }
+function onSwipe (e) { heroIndex.value = e.detail.current }
 function onComment () { uni.showToast({ title: '加载全部评论', icon: 'none' }) }
 function onService () { uni.showToast({ title: '正在接通客服…', icon: 'none' }) }
 </script>
@@ -186,7 +203,10 @@ function onService () { uni.showToast({ title: '正在接通客服…', icon: 'n
 .nav-title { flex: 1; text-align: center; font-size: 30rpx; font-weight: 700; color: #1F2937; }
 .nav-right { display: flex; gap: 12rpx; }
 
-.hero { width: 100%; height: 320rpx; display: block; }
+.hero-wrap { position: relative; }
+.hero-swiper { width: 100%; height: 460rpx; }
+.hero { width: 100%; height: 460rpx; display: block; }
+.hero-indicator { position: absolute; right: 24rpx; bottom: 20rpx; background: rgba(0,0,0,.5); color: #fff; padding: 4rpx 14rpx; border-radius: 16rpx; font-size: 20rpx; }
 
 .head { background: #fff; padding: 24rpx; margin-bottom: 16rpx; }
 .title { display: block; font-size: 32rpx; font-weight: 800; color: #1F2937; line-height: 1.4; }
@@ -239,12 +259,14 @@ function onService () { uni.showToast({ title: '正在接通客服…', icon: 'n
 .m-time { display: block; font-size: 20rpx; color: #6B7280; margin: 4rpx 0; }
 .m-desc { display: block; font-size: 22rpx; color: #4B5563; line-height: 1.6; margin-top: 6rpx; }
 
-.hotel-card { background: #F9FAFB; padding: 16rpx; border-radius: 12rpx; position: relative; }
+.hotel-card { background: #F9FAFB; border-radius: 12rpx; overflow: hidden; display: flex; gap: 16rpx; padding: 12rpx; position: relative; }
+.hc-img { width: 180rpx; height: 180rpx; border-radius: 10rpx; flex-shrink: 0; }
+.hc-body { flex: 1; position: relative; padding: 4rpx 4rpx 4rpx 0; }
 .hc-tag { background: #DC2626; color: #fff; padding: 2rpx 12rpx; font-size: 18rpx; border-radius: 4rpx; }
 .hc-name { display: block; font-size: 26rpx; font-weight: 700; color: #1F2937; margin-top: 8rpx; }
 .hc-meta { display: block; font-size: 20rpx; color: #F59E0B; margin-top: 4rpx; }
-.hc-desc { display: block; font-size: 22rpx; color: #6B7280; margin-top: 6rpx; }
-.hc-price { position: absolute; right: 16rpx; bottom: 16rpx; font-size: 30rpx; color: #DC2626; font-weight: 800; }
+.hc-desc { display: block; font-size: 22rpx; color: #6B7280; margin-top: 6rpx; line-height: 1.5; }
+.hc-price { position: absolute; right: 8rpx; bottom: 8rpx; font-size: 30rpx; color: #DC2626; font-weight: 800; }
 
 .food-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12rpx; }
 .food { padding: 20rpx; border-radius: 10rpx; text-align: center; }

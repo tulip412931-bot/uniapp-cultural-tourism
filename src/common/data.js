@@ -526,6 +526,12 @@ export const guides = [
     id: 'g1',
     title: '2024四面山最新游玩攻略合集',
     cover: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=70',
+    images: [
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=70',
+      'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=70',
+      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=70',
+      'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&q=70'
+    ],
     badge: '编辑精选',
     author: '山野旅行家',
     avatar: 'https://i.pravatar.cc/100?img=12',
@@ -587,7 +593,7 @@ export const guides = [
     ],
     accommodation: {
       title: '住宿推荐',
-      hotel: { name: '四面山大酒店', rating: 4.6, desc: '景区内核心位置，距望乡台瀑布步行10分钟', price: 328 }
+      hotel: { name: '四面山大酒店', cover: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=70', rating: 4.6, desc: '景区内核心位置，距望乡台瀑布步行10分钟', price: 328 }
     },
     foods: [
       { name: '江津酸菜鱼', icon: '🐟' },
@@ -604,61 +610,335 @@ export const guides = [
       ]
     },
     related: [
-      { id: 'g2', title: '四面山徒步全攻略：5条经典路线推荐', cover: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=300&q=70', author: '户外探险者', views: '2.8万', likes: '8800' }
+      { id: 'g2', title: '四面山深度游玩攻略：两天一夜', cover: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=300&q=70', author: '山野旅行家', views: '3.2万', likes: '2.8万' },
+      { id: 'g3', title: '四面山徒步全攻略：5条经典路线推荐', cover: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=300&q=70', author: '户外探险者', views: '2.8万', likes: '2.3万' },
+      { id: 'g4', title: '四面山摄影指南：10个最佳机位', cover: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=300&q=70', author: '光影捕手', views: '2.1万', likes: '1.9万' },
+      { id: 'g5', title: '江津美食地图：不可错过的地道风味', cover: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=300&q=70', author: '美食猎人', views: '1.9万', likes: '1.6万' }
     ]
   },
   {
     id: 'g2',
     title: '四面山深度游玩攻略：两天一夜解锁秘境之美',
     cover: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=70',
-    author: '山野旅行家',
-    avatar: 'https://i.pravatar.cc/100?img=12',
-    verified: true,
+    images: [
+      'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=70',
+      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=70',
+      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=70',
+      'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&q=70'
+    ],
+    author: '山野旅行家', avatar: 'https://i.pravatar.cc/100?img=12',
+    authorDesc: '资深户外达人', verified: true,
+    date: '2024-02-08', views: '3.2万', likes: '2.8万', favorites: '2.4万',
     rank: 1, hot: '3.2万',
-    tags: ['自然风光', '深度游'],
+    tags: ['自然风光', '深度游', '两天一夜'],
     summary: '涵盖最佳路线、住宿推荐、美食打卡和实用贴士，助你轻松玩转四面山。',
-    views: '3.2万', likes: '2.8万',
-    catalog: [], bestTime: null, daySchedule: [], musts: [],
-    accommodation: null, foods: [], tips: null, related: []
+    intro: '本攻略以"两天一夜"为时间维度，深入四面山腹地，解锁望乡台瀑布、洪海湖、土地岩等核心景点之外的隐藏秘境，让旅程兼具深度与诗意。',
+    catalog: [
+      '路线总览与适合人群',
+      'Day1：经典环线 + 望乡台瀑布',
+      'Day2：洪海湖晨雾 + 土地岩绝壁',
+      '住宿与餐饮推荐',
+      '装备清单与实用贴士'
+    ],
+    bestTime: { title: '出行季节与交通方式',
+      desc: '推荐 4-5 月和 9-10 月，气温 15-25℃，山花/红叶最佳。',
+      transport: [
+        { title: '高铁 + 景区直通车', desc: '重庆西站 → 江津站 (30 分钟)，江津汽车站每日 4 班直达四面山。' },
+        { title: '自驾导航', desc: '重庆主城走渝昆高速，约 130 公里 / 2 小时到达南门停车场。' }
+      ]
+    },
+    daySchedule: [
+      { day: 'Day 1', title: '环线穿越 + 瀑布之巅',
+        items: [
+          { time: '07:30', title: '南门集合', desc: '换乘景区观光车，办理入园手续' },
+          { time: '09:00', title: '望乡台瀑布', desc: '徒步至观瀑台，登高 200 级体验"水雾扑面"' },
+          { time: '12:00', title: '林间野餐', desc: '推荐自带轻食，山涧凉亭享受森林氧吧' },
+          { time: '15:00', title: '爱情天梯', desc: '探访 6208 级真实爱情遗迹，全程 1.5 小时' },
+          { time: '18:30', title: '入住山顶民宿', desc: '日落后云海翻涌，强烈推荐顶楼观景房' }
+        ]
+      },
+      { day: 'Day 2', title: '湖光晨雾 + 绝壁画卷',
+        items: [
+          { time: '06:00', title: '洪海湖晨雾', desc: '日出前湖面薄雾如纱，是摄影黄金时段' },
+          { time: '10:00', title: '土地岩观景台', desc: '俯瞰百米丹崖，可远眺四面山全景' },
+          { time: '13:00', title: '中山古镇午餐', desc: '品尝石板糍粑、烟熏豆腐、烟笋老腊肉' },
+          { time: '16:00', title: '返程', desc: '途中可顺访塘河古镇，购买伴手礼' }
+        ]
+      }
+    ],
+    musts: [
+      { title: '望乡台瀑布', cover: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&q=70',
+        tag: '必去', time: '2-3 小时',
+        desc: '亚洲第一高瀑，丰水期飞流如银河倒挂，建议上午 10 点前抵达避开人潮。' },
+      { title: '爱情天梯', cover: 'https://images.unsplash.com/photo-1542080681-b52d382432af?w=400&q=70',
+        tag: '推荐', time: '1.5 小时',
+        desc: '半个世纪手工凿出的 6208 级石阶，承载着刘国江与徐朝清的旷世爱情。' },
+      { title: '土地岩', cover: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=400&q=70',
+        tag: '小众', time: '1 小时',
+        desc: '川东丹霞绝壁的代表，登顶可俯瞰整个四面山林海与峡谷。' }
+    ],
+    accommodation: {
+      title: '住宿推荐',
+      hotel: { name: '四面山云端民宿', cover: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&q=70', rating: 4.8, desc: '海拔 1200 米的悬崖民宿，每间房均带观景阳台，含早餐', price: 588 }
+    },
+    foods: [
+      { name: '酸菜鱼', icon: '🐟' }, { name: '泉水豆花', icon: '🥣' }, { name: '腊肉饭', icon: '🍚' }
+    ],
+    tips: {
+      title: '装备清单与实用贴士',
+      list: [
+        { title: '徒步装备', desc: '防滑登山鞋、登山杖、护膝、速干衣裤' },
+        { title: '防护用品', desc: '防晒霜 SPF50、防蚊液、宽檐帽、雨衣（山区多雨）' },
+        { title: '现金携带', desc: '景区内部分餐馆仅收现金，建议备 300 元零钱' },
+        { title: '门票预订', desc: '官方公众号"四面山旅游"可享受 8 折优惠票' }
+      ]
+    },
+    related: [
+      { id: 'g1', title: '2024四面山最新游玩攻略合集', cover: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300&q=70', views: '3.2万', likes: '1.8万' },
+      { id: 'g3', title: '四面山徒步全攻略', cover: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=300&q=70', views: '2.8万', likes: '2.3万' }
+    ]
   },
   {
     id: 'g3',
     title: '四面山徒步全攻略：5条经典路线推荐',
     cover: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&q=70',
-    author: '户外探险者',
-    avatar: 'https://i.pravatar.cc/100?img=23',
+    images: [
+      'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&q=70',
+      'https://images.unsplash.com/photo-1455156218388-5e61b526818b?w=800&q=70',
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=70'
+    ],
+    author: '户外探险者', avatar: 'https://i.pravatar.cc/100?img=23',
+    authorDesc: '中国登协认证领队', verified: true,
+    date: '2024-02-15', views: '2.8万', likes: '2.3万', favorites: '1.7万',
     rank: 2, hot: '2.8万',
-    tags: ['徒步探险', '户外运动'],
+    tags: ['徒步探险', '户外运动', '小众路线'],
     summary: '从入门到进阶，精选5条徒步路线，适合不同体能水平的户外爱好者。',
-    views: '2.8万', likes: '2.3万',
-    catalog: [], bestTime: null, daySchedule: [], musts: [],
-    accommodation: null, foods: [], tips: null, related: []
+    intro: '四面山徒步资源丰富，5 条路线覆盖 2-25 公里全难度区间。本文标注每条路线的距离、累计爬升、用时、补给点与避坑点，供徒步爱好者按需选用。',
+    catalog: [
+      '路线难度分级说明',
+      '入门级：望乡台环线',
+      '进阶级：洪海湖大穿越',
+      '挑战级：飞龙峡纵走',
+      '装备与安全须知'
+    ],
+    bestTime: { title: '徒步季节建议',
+      desc: '3 月赏花、5 月避雨、10 月红叶最佳，7-8 月雨季需注意山洪。',
+      transport: [
+        { title: '集合点', desc: '景区南门徒步集散中心（含寄存柜、洗手间、热水）' },
+        { title: '应急救援', desc: '景区救援电话 023-4736-XXXX，建议下载"两步路户外"轨迹' }
+      ]
+    },
+    daySchedule: [
+      { day: '路线 A', title: '望乡台环线（入门 · 5 公里）',
+        items: [
+          { time: '入口', title: '南门 → 瀑布观景台', desc: '木栈道为主，海拔差 80 米' },
+          { time: '中段', title: '瀑布顶 → 林海长廊', desc: '原生林徒步，2 公里平缓上行' },
+          { time: '终点', title: '回到南门', desc: '全程 3 小时，适合家庭/亲子' }
+        ]
+      },
+      { day: '路线 B', title: '洪海湖大穿越（进阶 · 12 公里）',
+        items: [
+          { time: '07:30', title: '出发', desc: '从洪海湖码头出发，环湖徒步' },
+          { time: '11:00', title: '湖心岛', desc: '可午餐，岛上有补给点' },
+          { time: '15:00', title: '抵达大窝铺', desc: '原始森林穿越，需 6-7 小时' }
+        ]
+      },
+      { day: '路线 C', title: '飞龙峡纵走（挑战 · 25 公里）',
+        items: [
+          { time: 'Day1', title: '飞龙峡 → 龙潭湖', desc: '15 公里峡谷穿越，需露营装备' },
+          { time: 'Day2', title: '龙潭湖 → 望乡台', desc: '10 公里下撤路线，体能要求高' }
+        ]
+      }
+    ],
+    musts: [
+      { title: '飞龙峡', cover: 'https://images.unsplash.com/photo-1455156218388-5e61b526818b?w=400&q=70',
+        tag: '挑战', time: '6-8 小时',
+        desc: '原始森林峡谷，沿途 30+ 跌瀑，是重庆经典 BC 级线路之一。' },
+      { title: '大窝铺原始林', cover: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=70',
+        tag: '生态', time: '4 小时',
+        desc: '川东南海拔最高的常绿阔叶林，林冠遮天蔽日，是天然氧吧。' }
+    ],
+    accommodation: {
+      title: '装备租赁',
+      hotel: { name: '四面山户外补给站', cover: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=400&q=70', rating: 4.7, desc: '提供登山杖、头灯、帐篷、雨衣租赁与押金回购', price: 50 }
+    },
+    foods: [
+      { name: '能量棒', icon: '🍫' }, { name: '电解水', icon: '💧' }, { name: '炒米饭', icon: '🍱' }
+    ],
+    tips: {
+      title: '徒步安全须知',
+      list: [
+        { title: '出发前', desc: '请告知家人路线和预计返回时间，留好应急联系人' },
+        { title: '装备', desc: '徒步鞋、护膝、急救包、保温毯为必备物品' },
+        { title: '天气', desc: '出发前查看景区天气预报，遇暴雨/雷电严禁进山' },
+        { title: '禁忌', desc: '严禁吸烟、生火、采摘、惊扰野生动物' }
+      ]
+    },
+    related: [
+      { id: 'g2', title: '四面山深度游玩攻略：两天一夜', cover: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=300&q=70', views: '3.2万', likes: '2.8万' },
+      { id: 'g4', title: '四面山摄影指南', cover: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=300&q=70', views: '2.1万', likes: '1.9万' }
+    ]
   },
   {
     id: 'g4',
     title: '四面山摄影指南：10个最佳机位分享',
     cover: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=70',
-    author: '光影捕手',
-    avatar: 'https://i.pravatar.cc/100?img=35',
+    images: [
+      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=70',
+      'https://images.unsplash.com/photo-1500380804539-4e1e8c1e7118?w=800&q=70',
+      'https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?w=800&q=70'
+    ],
+    author: '光影捕手', avatar: 'https://i.pravatar.cc/100?img=35',
+    authorDesc: '风光摄影师 · 公众号「山色映像」',
+    date: '2024-03-02', views: '2.1万', likes: '1.9万', favorites: '1.5万',
     rank: 3, hot: '2.1万',
-    tags: ['摄影', '美图打卡'],
+    tags: ['摄影', '美图打卡', '机位推荐'],
     summary: '精选10个四面山最佳摄影机位，附详细拍摄建议。',
-    views: '2.1万', likes: '1.9万',
-    catalog: [], bestTime: null, daySchedule: [], musts: [],
-    accommodation: null, foods: [], tips: null, related: []
+    intro: '从无人机航拍到长曝丝绢流水，本文按"日出/日落/夜景/微距"四大主题，整理 10 个亲测最佳机位的坐标、参数与最佳光线。',
+    catalog: [
+      '摄影器材建议',
+      '日出篇：3 个云海机位',
+      '日落篇：4 个山岭金边机位',
+      '夜景篇：星轨与银河',
+      '后期与版权说明'
+    ],
+    bestTime: { title: '出片最佳时机',
+      desc: '日出前 30 分钟到日出后 1 小时为"魔法时刻"；雨后云海概率提升 80%。',
+      transport: [
+        { title: '推荐器材', desc: '24-70mm 标变 + 70-200mm 长焦；无人机推荐 DJI Mavic 3 Pro' },
+        { title: '滤镜', desc: 'GND 0.9 渐变镜 + ND1000 减光镜，处理大光比与丝绢水景' }
+      ]
+    },
+    daySchedule: [
+      { day: '日出篇', title: '云海与晨雾',
+        items: [
+          { time: '机位 1', title: '土地岩观景台', desc: '俯拍云海翻涌，焦段 24-35mm，f/8 ISO100' },
+          { time: '机位 2', title: '洪海湖东岸', desc: '湖面倒影 + 晨雾，三脚架长曝 1-2 秒' },
+          { time: '机位 3', title: '望乡台顶', desc: '航拍俯瞰瀑布全景，建议 8 点前避免游客' }
+        ]
+      },
+      { day: '日落篇', title: '金色山岭',
+        items: [
+          { time: '机位 4', title: '飞龙峡西山', desc: '夕阳镶金边，70-200mm 压缩感强烈' },
+          { time: '机位 5', title: '南门停车场上方', desc: '步行 15 分钟到达，可俯拍古镇灯火' }
+        ]
+      },
+      { day: '夜景篇', title: '星轨与银河',
+        items: [
+          { time: '机位 6', title: '大窝铺草坪', desc: '无光污染，3-4 月可拍银河中心' },
+          { time: '机位 7', title: '洪海湖中央', desc: '需提前与船家预约凌晨包船' }
+        ]
+      }
+    ],
+    musts: [
+      { title: '望乡台瀑布航拍', cover: 'https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?w=400&q=70',
+        tag: '航拍', time: '日出/日落',
+        desc: '无人机起飞点：南门停车场（已报备空域），飞行高度建议 80-120m。' },
+      { title: '洪海湖星空', cover: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=400&q=70',
+        tag: '夜景', time: '23:00-04:00',
+        desc: '湖面倒影银河 + 山体剪影，建议使用 24mm f/1.4 镜头。' }
+    ],
+    accommodation: {
+      title: '出片民宿',
+      hotel: { name: '云崖观景酒店', cover: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=400&q=70', rating: 4.9, desc: '270° 落地窗观景房，房内即可拍日出云海', price: 1280 }
+    },
+    foods: [
+      { name: '热咖啡', icon: '☕' }, { name: '即食面', icon: '🍜' }, { name: '能量棒', icon: '🍫' }
+    ],
+    tips: {
+      title: '摄影注意事项',
+      list: [
+        { title: '电池', desc: '低温下电量下降 50%，建议至少携带 3 块备用电池' },
+        { title: '安全', desc: '夜拍务必结伴同行，景区夜间有野生动物出没' },
+        { title: '版权', desc: '景区禁止商业拍摄牟利，个人作品可正常使用' }
+      ]
+    },
+    related: [
+      { id: 'g1', title: '四面山最新游玩攻略合集', cover: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300&q=70', views: '3.2万', likes: '1.8万' }
+    ]
   },
   {
     id: 'g5',
     title: '江津美食地图：不可错过的地道风味',
     cover: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&q=70',
-    author: '美食猎人',
-    avatar: 'https://i.pravatar.cc/100?img=45',
-    verified: true,
-    tags: ['美食探店', '地方特色'],
+    images: [
+      'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&q=70',
+      'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=70',
+      'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=70'
+    ],
+    author: '美食猎人', avatar: 'https://i.pravatar.cc/100?img=45',
+    authorDesc: '川渝美食撰稿人 · 大众点评 V8', verified: true,
+    date: '2024-03-12', views: '1.9万', likes: '1.6万', favorites: '1.3万',
+    tags: ['美食探店', '地方特色', '老字号'],
     summary: '从酸菜鱼到米花糖，带你吃遍江津最地道的美食，附详细店铺推荐。',
-    views: '1.9万', likes: '1.6万',
-    catalog: [], bestTime: null, daySchedule: [], musts: [],
-    accommodation: null, foods: [], tips: null, related: []
+    intro: '江津地处长江与綦江交汇，物产丰富，孕育了酸菜鱼、米花糖、白酒、烧烤等独具一格的饮食文化。本攻略按"主城-中山-塘河-四面山"四条美食动线展开。',
+    catalog: [
+      '江津味道总览',
+      '主城区：酸菜鱼三巨头',
+      '中山古镇：传统点心',
+      '塘河古镇：江湖菜',
+      '四面山：山野食材'
+    ],
+    bestTime: { title: '美食季节性推荐',
+      desc: '春季尝春笋，夏季吃青椒鳝鱼，秋季品板栗鸡，冬季最适合涮老腊肉火锅。',
+      transport: [
+        { title: '老饕带路', desc: '推荐关注公众号「江津吃货团」，获取每月新店探访' },
+        { title: '味觉地图', desc: '攻略文末附 PDF 版美食地图，标注 50+ 老字号位置' }
+      ]
+    },
+    daySchedule: [
+      { day: '主城线', title: '酸菜鱼三巨头',
+        items: [
+          { time: '午餐', title: '邹鱼匠（创始店）', desc: '人均 60，必点：金汤酸菜鱼 + 豆花饭，下午2点后无座' },
+          { time: '下午茶', title: '老白干米花糖博物馆', desc: '免费品尝 6 种口味米花糖，可购买伴手礼' },
+          { time: '晚餐', title: '袁记酸菜鱼老店', desc: '本地人最爱，黑鱼现杀，建议 5 点前到店' }
+        ]
+      },
+      { day: '古镇线', title: '中山古镇 + 塘河古镇',
+        items: [
+          { time: '早茶', title: '石板糍粑摊', desc: '现舂现卖，蘸黄豆粉或红糖，¥5/份' },
+          { time: '午餐', title: '中山老酒馆', desc: '推荐烟熏豆腐 + 老白干 + 烧白，人均 50' },
+          { time: '晚餐', title: '塘河九大碗', desc: '正宗川东婚宴菜，需提前一天电话预约' }
+        ]
+      },
+      { day: '山野线', title: '四面山味道',
+        items: [
+          { time: '午餐', title: '林海酒家', desc: '高山野菌 + 土鸡，菌子需提前致电询问当日有无' },
+          { time: '晚餐', title: '苗寨长桌宴', desc: '15 人起订，包含 12 道苗家特色，¥98/人' }
+        ]
+      }
+    ],
+    musts: [
+      { title: '江津酸菜鱼', cover: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&q=70',
+        tag: '招牌', time: '全年',
+        desc: '与南川酸菜鱼齐名，特色在于"老坛酸菜+鲜活黑鱼+热油激香"，汤金黄微酸。' },
+      { title: '米花糖', cover: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&q=70',
+        tag: '伴手礼', time: '全年',
+        desc: '中华老字号「玫瑰牌」始创于 1910 年，香甜酥脆，是重庆最具代表性的传统点心。' },
+      { title: '老白干', cover: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=400&q=70',
+        tag: '醇香', time: '全年',
+        desc: '小高粱酿造，52° 入口绵柔，是江津人款待贵客的标配酒款。' }
+    ],
+    accommodation: {
+      title: '美食民宿',
+      hotel: { name: '中山古镇·味道客栈', cover: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=400&q=70', rating: 4.7, desc: '老房改造，含早晚餐（古法石磨豆花 + 烧白），步行 2 分钟到美食街', price: 388 }
+    },
+    foods: [
+      { name: '酸菜鱼', icon: '🐟' }, { name: '米花糖', icon: '🍪' }, { name: '老白干', icon: '🥃' }
+    ],
+    tips: {
+      title: '寻味避坑指南',
+      list: [
+        { title: '认准老字号', desc: '景区周边山寨店较多，请认准"邹鱼匠/袁记/玫瑰牌"金字招牌' },
+        { title: '错峰用餐', desc: '中午 12-13 点为高峰，建议 11:30 前或 13:30 后到店' },
+        { title: '辣度提示', desc: '江津菜辣度普遍偏高，可主动告知"微辣"或"不辣"' },
+        { title: '伴手礼', desc: '玫瑰牌米花糖、几江老白干、九叶青花椒均为正宗伴手礼' }
+      ]
+    },
+    related: [
+      { id: 'g1', title: '四面山最新游玩攻略合集', cover: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300&q=70', views: '3.2万', likes: '1.8万' },
+      { id: 'g2', title: '四面山深度游玩攻略', cover: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=300&q=70', views: '3.2万', likes: '2.8万' }
+    ]
   }
 ]
 
