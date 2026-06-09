@@ -1,55 +1,123 @@
 <template>
   <view class="page">
-    <view class="banner">
-      <text class="b-t">国潮文创</text>
-      <text class="b-s">让传统美学融入日常生活</text>
+    <view class="nav">
+      <view class="nav-btn" @click="back">‹</view>
+      <text class="nav-title">文创周边</text>
+      <view class="nav-btn cart">🛒<text class="dot">2</text></view>
     </view>
-    <view class="grid">
-      <view v-for="item in list" :key="item.id" class="card" @tap="goto(item.id)">
-        <image :src="item.cover" mode="aspectFill" class="cover" />
-        <view class="body">
-          <text class="title">{{ item.title }}</text>
-          <view class="tags">
-            <text v-for="t in item.tags" :key="t" class="tag">{{ t }}</text>
-          </view>
-          <view class="price-row">
-            <text class="price">¥{{ item.price }}</text>
-            <text class="sold">已售 {{ item.sold }}</text>
+
+    <view class="search">
+      <text class="ic">🔍</text>
+      <text class="ph">搜索文创产品</text>
+    </view>
+
+    <scroll-view scroll-x class="chips">
+      <view class="chip" v-for="(c, i) in chips" :key="i" :class="{ active: i === activeChip }" @click="activeChip = i">{{ c }}</view>
+    </scroll-view>
+
+    <view class="hero">
+      <image class="hero-img" src="https://images.unsplash.com/photo-1545569310-ab0fb6efeec7?w=800&q=70" mode="aspectFill" />
+    </view>
+
+    <!-- 热销专区 -->
+    <view class="block">
+      <view class="block-head">
+        <text class="bh-bar"></text>
+        <text class="bh-title">热销专区</text>
+        <text class="bh-more">更多 ›</text>
+      </view>
+      <view class="grid">
+        <view class="prod" v-for="item in hot" :key="item.id" @click="goDetail(item.id)">
+          <image class="p-img" :src="item.cover" mode="aspectFill" />
+          <view class="p-body">
+            <text class="p-title">{{ item.title }}</text>
+            <view class="p-meta"><text>⭐ {{ item.rating }}</text><text> · 已售{{ item.sold }}</text></view>
+            <view class="p-price">
+              <text class="cur">¥{{ item.price }}</text>
+              <text class="ori">¥{{ item.originalPrice }}</text>
+            </view>
           </view>
         </view>
       </view>
     </view>
+
+    <!-- 新品上市 -->
+    <view class="block">
+      <view class="block-head">
+        <text class="bh-bar"></text>
+        <text class="bh-title">新品上市</text>
+        <text class="bh-more">更多 ›</text>
+      </view>
+      <view class="grid">
+        <view class="prod" v-for="item in fresh" :key="item.id" @click="goDetail(item.id)">
+          <view class="p-img-wrap">
+            <image class="p-img" :src="item.cover" mode="aspectFill" />
+            <text class="new-tag">新品</text>
+          </view>
+          <view class="p-body">
+            <text class="p-title">{{ item.title }}</text>
+            <view class="p-meta"><text>⭐ {{ item.rating }}</text><text> · 已售{{ item.sold }}</text></view>
+            <view class="p-price">
+              <text class="cur">¥{{ item.price }}</text>
+              <text class="ori">¥{{ item.originalPrice }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view style="height: 160rpx"></view>
+    <TabBar active="cart" />
   </view>
 </template>
 
 <script setup>
 import { cultural } from '@/common/data.js'
-const list = cultural
-function goto (id) { uni.navigateTo({ url: '/pages/cultural/detail?id=' + id }) }
+import TabBar from '@/components/TabBar.vue'
+import { ref } from 'vue'
+
+const chips = ['全部', '非遗手作', '特色食品', '创意文具']
+const activeChip = ref(0)
+const hot = cultural.slice(0, 4)
+const fresh = cultural.slice(4)
+
+function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/index/index' }) }) }
+function goDetail (id) { uni.navigateTo({ url: `/pages/cultural/detail?id=${id}` }) }
 </script>
 
-<style lang="scss">
-page { background: #F3F4F6; }
-.page { padding: 24rpx; }
-.banner {
-  background: linear-gradient(135deg, #fbbf24, #d97706); color: #fff;
-  padding: 32rpx; border-radius: 24rpx; margin-bottom: 24rpx;
-  display: flex; flex-direction: column; gap: 8rpx;
-}
-.b-t { font-size: 36rpx; font-weight: 700; }
-.b-s { font-size: 24rpx; opacity: .9; }
-.grid { display: flex; flex-wrap: wrap; gap: 20rpx; }
-.card {
-  width: calc(50% - 10rpx);
-  background: #fff; border-radius: 20rpx; overflow: hidden;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,.05);
-}
-.cover { width: 100%; height: 280rpx; }
-.body { padding: 20rpx; }
-.title { font-size: 26rpx; color: #1F2937; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 72rpx; }
-.tags { display: flex; gap: 8rpx; margin: 10rpx 0; flex-wrap: wrap; }
-.tag { background: #FFFBEB; color: #B45309; font-size: 18rpx; padding: 4rpx 10rpx; border-radius: 6rpx; }
-.price-row { display: flex; justify-content: space-between; align-items: flex-end; }
-.price { color: #DC2626; font-size: 30rpx; font-weight: 700; }
-.sold { color: #9CA3AF; font-size: 20rpx; }
+<style lang="scss" scoped>
+.page { background: #F3F4F6; min-height: 100vh; padding-top: env(safe-area-inset-top); }
+.nav { display: flex; align-items: center; padding: 20rpx 24rpx; gap: 20rpx; }
+.nav-btn { width: 60rpx; height: 60rpx; border-radius: 50%; background: #ECEEF2; display: flex; align-items: center; justify-content: center; font-size: 28rpx; color: #1F2937; position: relative; }
+.nav-btn.cart .dot { position: absolute; top: -4rpx; right: -4rpx; background: #DC2626; color: #fff; font-size: 16rpx; border-radius: 16rpx; min-width: 28rpx; height: 28rpx; line-height: 28rpx; text-align: center; padding: 0 6rpx; }
+.nav-title { flex: 1; text-align: center; font-size: 32rpx; font-weight: 700; color: #1F2937; }
+
+.search { margin: 0 24rpx 16rpx; height: 70rpx; background: #ECEEF2; border-radius: 35rpx; display: flex; align-items: center; padding: 0 24rpx; gap: 12rpx; }
+.search .ic { color: #9CA3AF; }
+.search .ph { font-size: 24rpx; color: #9CA3AF; }
+
+.chips { white-space: nowrap; padding: 0 24rpx 20rpx; }
+.chips .chip { display: inline-block; padding: 10rpx 24rpx; background: #fff; border-radius: 36rpx; font-size: 24rpx; color: #4B5563; margin-right: 16rpx; &.active { background: #EFF6FF; color: #2563EB; border: 2rpx solid #BFDBFE; } }
+
+.hero { margin: 0 24rpx 24rpx; border-radius: 16rpx; overflow: hidden; height: 200rpx; }
+.hero-img { width: 100%; height: 100%; display: block; }
+
+.block { margin: 0 24rpx 24rpx; }
+.block-head { display: flex; align-items: center; gap: 12rpx; margin-bottom: 16rpx; }
+.bh-bar { width: 8rpx; height: 28rpx; background: #DC2626; border-radius: 4rpx; }
+.bh-title { font-size: 30rpx; font-weight: 800; color: #1F2937; flex: 1; }
+.bh-more { font-size: 22rpx; color: #2563EB; }
+
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20rpx; }
+.prod { background: #fff; border-radius: 16rpx; overflow: hidden; box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04); }
+.p-img-wrap { position: relative; }
+.p-img { width: 100%; height: 240rpx; display: block; }
+.new-tag { position: absolute; top: 12rpx; left: 12rpx; background: #DC2626; color: #fff; font-size: 18rpx; padding: 2rpx 10rpx; border-radius: 4rpx; }
+.p-body { padding: 16rpx; }
+.p-title { display: block; font-size: 22rpx; color: #1F2937; line-height: 1.4; min-height: 60rpx; overflow: hidden; }
+.p-meta { display: flex; gap: 8rpx; font-size: 18rpx; color: #F59E0B; margin: 8rpx 0; }
+.p-meta text:last-child { color: #6B7280; }
+.p-price { display: flex; align-items: baseline; gap: 8rpx; }
+.p-price .cur { font-size: 28rpx; color: #DC2626; font-weight: 800; }
+.p-price .ori { font-size: 18rpx; color: #9CA3AF; text-decoration: line-through; }
 </style>

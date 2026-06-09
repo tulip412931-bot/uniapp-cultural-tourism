@@ -1,241 +1,212 @@
 <template>
   <view class="page">
-    <!-- 顶部状态栏 + 头部 -->
+    <!-- 顶部状态栏 + 品牌头 -->
     <view class="header">
-      <view class="status-bar"></view>
-      <view class="brand">
-        <view class="brand-left">
-          <text class="brand-title">文旅</text>
-          <text class="brand-sub">CULTURAL · TRAVEL</text>
+      <view class="brand-row">
+        <view class="brand">
+          <image class="brand-logo" src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=120&q=70" mode="aspectFill" />
+          <view class="brand-text">
+            <text class="brand-en">CHONGQING JIANGJIN</text>
+            <text class="brand-cn">一江津彩</text>
+          </view>
         </view>
-        <view class="brand-right">
-          <text class="iconfont">🔍</text>
-          <text class="iconfont">🔔</text>
+        <view class="search">
+          <text class="ic">🔍</text>
+          <text class="ph">搜索景点、美食、线路</text>
         </view>
-      </view>
-      <!-- Banner -->
-      <view class="banner">
-        <image
-          src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=70"
-          mode="aspectFill"
-          class="banner-img"
-        />
-        <view class="banner-mask">
-          <text class="banner-title">发现身边的诗与远方</text>
-          <text class="banner-sub">徒步 · 门票 · 民宿 · 文创 · 攻略</text>
-        </view>
+        <view class="more">⋮</view>
+        <view class="user">👤</view>
       </view>
     </view>
 
-    <!-- 功能图标区 -->
+    <!-- Banner 融媒贴片 -->
+    <view class="banner">
+      <text class="banner-title">融媒贴片</text>
+      <text class="banner-sub">— 江津彩在江津</text>
+    </view>
+
+    <!-- 功能图标区 5x2 -->
     <view class="grid">
-      <view
-        v-for="item in modules"
-        :key="item.key"
-        class="grid-item"
-        :data-key="item.key"
-        @tap="goto(item.path)"
-      >
-        <view class="grid-icon" :style="{ background: item.color }">
-          <text class="grid-emoji">{{ item.emoji }}</text>
-        </view>
-        <text class="grid-label">{{ item.label }}</text>
+      <view class="cell" v-for="(it, i) in icons" :key="i" @click="onIcon(it)">
+        <view class="cell-ic"><text>{{ it.emoji }}</text></view>
+        <text class="cell-label">{{ it.label }}</text>
       </view>
     </view>
 
-    <!-- 地图导览区域 -->
-    <view class="section">
-      <view class="section-head">
-        <text class="section-title">地图导览</text>
-        <text class="section-more">查看全部 ></text>
+    <!-- 江津风物地图导览 -->
+    <view class="map-card">
+      <text class="map-title">江津风物地图导览</text>
+    </view>
+
+    <!-- 工会福利汇 -->
+    <view class="welfare">
+      <view class="welfare-head">
+        <view>
+          <text class="welfare-title">工会福利汇</text>
+          <text class="welfare-sub">好物线上线下随心兑</text>
+        </view>
+        <view class="welfare-go">GO</view>
       </view>
-      <view class="map-card">
-        <image
-          src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=70"
-          mode="aspectFill"
-          class="map-img"
-        />
-        <view class="map-info">
-          <text class="map-title">附近精选景点</text>
-          <text class="map-sub">3 公里内 12 处景点 · 5 条徒步线路</text>
+      <view class="welfare-row">
+        <view class="welfare-card">
+          <text class="wc-title">重百超市</text>
+          <text class="wc-sub">全城门店通用</text>
+        </view>
+        <view class="welfare-card">
+          <text class="wc-title">天猫超市</text>
+          <text class="wc-sub">直接配送到家</text>
         </view>
       </view>
     </view>
 
-    <!-- 工会福利汇区域 -->
-    <view class="section">
-      <view class="section-head">
-        <text class="section-title">工会福利汇</text>
-        <text class="section-more">更多 ></text>
+    <!-- 会员推荐 -->
+    <view class="member">
+      <view class="member-head">
+        <text class="member-title">会员推荐</text>
+        <text class="member-sub">尽享江津风物珍馐/漫游江津山水珍味</text>
+        <view class="member-more">更多 <text class="arrow">›</text></view>
       </view>
-      <scroll-view scroll-x class="benefit-scroll" :show-scrollbar="false">
-        <view
-          v-for="b in benefits"
-          :key="b.id"
-          class="benefit-card"
-        >
-          <image :src="b.cover" mode="aspectFill" class="benefit-img" />
-          <view class="benefit-meta">
-            <text class="benefit-title">{{ b.title }}</text>
-            <text class="benefit-price">¥{{ b.price }}<text class="benefit-ori"> ¥{{ b.ori }}</text></text>
+      <scroll-view scroll-x class="tabs">
+        <view class="tab" v-for="(t, i) in memberTabs" :key="i" :class="{ active: i === 0 }">{{ t }}</view>
+      </scroll-view>
+      <scroll-view scroll-x class="products">
+        <view class="product" v-for="(p, i) in products" :key="i" @click="goCultural(p.id)">
+          <image class="p-img" :src="p.cover" mode="aspectFill" />
+          <view class="p-info">
+            <text class="p-name">商品名称</text>
+            <text class="p-price">¥{{ p.price }}</text>
           </view>
         </view>
       </scroll-view>
     </view>
 
-    <!-- 会员推荐区域 -->
-    <view class="section">
-      <view class="section-head">
-        <text class="section-title">会员推荐</text>
-        <text class="section-more">VIP 专属 ></text>
-      </view>
-      <view class="vip-card">
-        <view class="vip-left">
-          <text class="vip-title">开通会员</text>
-          <text class="vip-sub">门票直降 ¥50，民宿额外 9 折</text>
-          <view class="vip-btn"><text>立即开通</text></view>
-        </view>
-        <text class="vip-emoji">👑</text>
-      </view>
-    </view>
+    <!-- 底部留白给 tabbar -->
+    <view style="height: 160rpx"></view>
 
-    <!-- 底部导航 -->
-    <view class="tabbar">
-      <view class="tab-item active">
-        <text class="tab-emoji">🏠</text>
-        <text class="tab-text">首页</text>
-      </view>
-      <view class="tab-item" @tap="goto('/pages/hiking/list')">
-        <text class="tab-emoji">🥾</text>
-        <text class="tab-text">徒步</text>
-      </view>
-      <view class="tab-item" @tap="goto('/pages/ticket/list')">
-        <text class="tab-emoji">🎫</text>
-        <text class="tab-text">门票</text>
-      </view>
-      <view class="tab-item" @tap="goto('/pages/guide/list')">
-        <text class="tab-emoji">📖</text>
-        <text class="tab-text">攻略</text>
-      </view>
-    </view>
+    <TabBar active="home" />
   </view>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { cultural } from '@/common/data.js'
+import TabBar from '@/components/TabBar.vue'
 
-const modules = ref([
-  { key: 'hiking', label: '徒步线路', emoji: '🥾', color: 'linear-gradient(135deg,#34d399,#059669)', path: '/pages/hiking/list' },
-  { key: 'ticket', label: '景区门票', emoji: '🎫', color: 'linear-gradient(135deg,#60a5fa,#2563eb)', path: '/pages/ticket/list' },
-  { key: 'hotel',  label: '酒店民宿', emoji: '🏨', color: 'linear-gradient(135deg,#f472b6,#db2777)', path: '/pages/hotel/list' },
-  { key: 'cultural', label: '文创周边', emoji: '🎨', color: 'linear-gradient(135deg,#fbbf24,#d97706)', path: '/pages/cultural/list' },
-  { key: 'guide', label: '游玩攻略', emoji: '📖', color: 'linear-gradient(135deg,#a78bfa,#7c3aed)', path: '/pages/guide/list' }
-])
+const icons = [
+  { key: 'taste', emoji: '🍜', label: '寻味江津' },
+  { key: 'heritage', emoji: '✨', label: '璀璨非遗' },
+  { key: 'goods', emoji: '🎁', label: '津彩好物' },
+  { key: 'specialty', emoji: '🌾', label: '乡珍荟萃' },
+  { key: 'shop', emoji: '🛒', label: '在线商城' },
+  { key: 'hiking', emoji: '🥾', label: '徒步线路' },
+  { key: 'ticket', emoji: '🎫', label: '景区门票' },
+  { key: 'hotel', emoji: '🏨', label: '酒店民宿' },
+  { key: 'cultural', emoji: '🎨', label: '文创周边' },
+  { key: 'guide', emoji: '📖', label: '游玩攻略' }
+]
+const memberTabs = ['热门商品', '当季美味', '周边游玩', '送礼专享']
+const products = cultural.slice(0, 6)
 
-const benefits = ref([
-  { id: 1, title: '黄山门票工会专享', price: 99, ori: 190, cover: 'https://images.unsplash.com/photo-1545569310-ab0fb6efeec7?w=400&q=70' },
-  { id: 2, title: '故宫深度讲解', price: 49, ori: 80, cover: 'https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=400&q=70' },
-  { id: 3, title: '莫干山民宿夜', price: 488, ori: 880, cover: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&q=70' },
-  { id: 4, title: '雨崩徒步领队', price: 1980, ori: 2680, cover: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&q=70' }
-])
-
-function goto (url) {
-  uni.navigateTo({ url })
+function onIcon (it) {
+  const map = {
+    hiking: '/pages/hiking/list',
+    ticket: '/pages/ticket/list',
+    hotel: '/pages/hotel/list',
+    cultural: '/pages/cultural/list',
+    guide: '/pages/guide/list',
+    taste: '/pages/cultural/list',
+    heritage: '/pages/cultural/list',
+    goods: '/pages/cultural/list',
+    specialty: '/pages/cultural/list',
+    shop: '/pages/cultural/list'
+  }
+  uni.navigateTo({ url: map[it.key] || '/pages/cultural/list' })
+}
+function goCultural (id) {
+  uni.navigateTo({ url: `/pages/cultural/detail?id=${id}` })
 }
 </script>
 
-<style lang="scss">
-page { background: #F3F4F6; }
-.page { padding-bottom: 140rpx; }
-.header {
-  background: linear-gradient(180deg, #1F2937 0%, #374151 100%);
-  padding: 0 32rpx 60rpx;
+<style lang="scss" scoped>
+.page { background: #F3F4F6; min-height: 100vh; padding-top: env(safe-area-inset-top); }
+
+.header { padding: 20rpx 24rpx 16rpx; background: #F3F4F6; }
+.brand-row { display: flex; align-items: center; gap: 12rpx; }
+.brand { display: flex; align-items: center; gap: 12rpx; }
+.brand-logo { width: 80rpx; height: 80rpx; border-radius: 16rpx; }
+.brand-text { display: flex; flex-direction: column; }
+.brand-en { font-size: 18rpx; color: #6B7280; letter-spacing: 1rpx; }
+.brand-cn { font-size: 32rpx; color: #1F2937; font-weight: 700; }
+.search {
+  flex: 1; background: #ECEEF2; border-radius: 32rpx; height: 64rpx;
+  display: flex; align-items: center; padding: 0 20rpx; gap: 8rpx;
+  .ic { font-size: 24rpx; color: #9CA3AF; }
+  .ph { font-size: 22rpx; color: #9CA3AF; line-height: 1.2; }
 }
-.status-bar { height: 60rpx; }
-.brand { display: flex; align-items: center; justify-content: space-between; padding: 16rpx 0 24rpx; }
-.brand-left { display: flex; flex-direction: column; }
-.brand-title { color: #fff; font-size: 44rpx; font-weight: 700; letter-spacing: 4rpx; }
-.brand-sub { color: rgba(255,255,255,.55); font-size: 18rpx; letter-spacing: 2rpx; }
-.brand-right { display: flex; gap: 24rpx; }
-.brand-right .iconfont { font-size: 36rpx; }
-.banner { position: relative; border-radius: 24rpx; overflow: hidden; height: 280rpx; }
-.banner-img { width: 100%; height: 100%; }
-.banner-mask {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.45));
-  display: flex; flex-direction: column; justify-content: flex-end; padding: 28rpx;
+.more, .user {
+  width: 60rpx; height: 60rpx; border-radius: 50%; background: #ECEEF2;
+  display: flex; align-items: center; justify-content: center; font-size: 28rpx; color: #4B5563;
 }
-.banner-title { color: #fff; font-size: 38rpx; font-weight: 700; }
-.banner-sub { color: rgba(255,255,255,.85); font-size: 24rpx; margin-top: 8rpx; }
+
+.banner {
+  margin: 16rpx 24rpx 24rpx; background: #ECEEF2; border-radius: 24rpx;
+  height: 280rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12rpx;
+  .banner-title { font-size: 44rpx; font-weight: 700; color: #1F2937; letter-spacing: 4rpx; }
+  .banner-sub { font-size: 30rpx; color: #1F2937; }
+}
 
 .grid {
-  display: flex; justify-content: space-between;
-  background: #fff;
-  margin: -40rpx 24rpx 24rpx;
-  padding: 32rpx 24rpx;
-  border-radius: 24rpx;
-  box-shadow: 0 8rpx 24rpx rgba(31,41,55,0.06);
-  position: relative; z-index: 2;
+  margin: 0 24rpx; background: transparent;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 24rpx 0; padding: 16rpx 0 24rpx;
+  .cell {
+    display: flex; flex-direction: column; align-items: center; gap: 12rpx;
+    .cell-ic {
+      width: 96rpx; height: 96rpx; border-radius: 50%; background: #E5E7EB;
+      display: flex; align-items: center; justify-content: center; font-size: 40rpx;
+    }
+    .cell-label { font-size: 24rpx; color: #1F2937; }
+  }
 }
-.grid-item { display: flex; flex-direction: column; align-items: center; flex: 1; }
-.grid-icon {
-  width: 88rpx; height: 88rpx; border-radius: 24rpx;
-  display: flex; align-items: center; justify-content: center; margin-bottom: 12rpx;
-}
-.grid-emoji { font-size: 44rpx; }
-.grid-label { font-size: 24rpx; color: #1F2937; }
 
-.section { margin: 32rpx 24rpx; }
-.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20rpx; }
-.section-title { font-size: 32rpx; font-weight: 700; color: #1F2937; }
-.section-more { font-size: 24rpx; color: #6B7280; }
+.map-card {
+  margin: 8rpx 24rpx 24rpx; background: #ECEEF2; border-radius: 24rpx;
+  height: 220rpx; display: flex; align-items: center; justify-content: center;
+  .map-title { font-size: 36rpx; font-weight: 700; color: #1F2937; }
+}
 
-.map-card { position: relative; border-radius: 24rpx; overflow: hidden; background: #fff; height: 280rpx; }
-.map-img { width: 100%; height: 100%; }
-.map-info {
-  position: absolute; left: 0; right: 0; bottom: 0; padding: 24rpx;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,.6)); color: #fff;
+.welfare {
+  margin: 0 24rpx 24rpx; background: #ECEEF2; border-radius: 24rpx; padding: 28rpx 28rpx 24rpx;
+  .welfare-head { display: flex; align-items: center; justify-content: space-between; }
+  .welfare-title { display: block; font-size: 36rpx; font-weight: 700; color: #1F2937; }
+  .welfare-sub { display: block; font-size: 22rpx; color: #6B7280; margin-top: 4rpx; }
+  .welfare-go {
+    width: 80rpx; height: 80rpx; border-radius: 50%; background: #fff; color: #1F2937;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 24rpx;
+  }
+  .welfare-row { display: flex; gap: 20rpx; margin-top: 24rpx; }
+  .welfare-card {
+    flex: 1; background: #fff; border-radius: 16rpx; padding: 24rpx; text-align: center;
+    .wc-title { display: block; font-size: 28rpx; font-weight: 700; color: #1F2937; }
+    .wc-sub { display: block; font-size: 20rpx; color: #6B7280; margin-top: 8rpx; }
+  }
 }
-.map-title { display: block; font-size: 30rpx; font-weight: 700; }
-.map-sub { display: block; font-size: 22rpx; margin-top: 4rpx; opacity: .9; }
 
-.benefit-scroll { white-space: nowrap; }
-.benefit-card {
-  display: inline-flex; flex-direction: column; width: 260rpx;
-  background: #fff; border-radius: 20rpx; overflow: hidden;
-  margin-right: 20rpx; vertical-align: top;
-  box-shadow: 0 6rpx 16rpx rgba(31,41,55,0.05);
+.member { margin: 0 24rpx 24rpx; }
+.member-head { display: flex; align-items: center; gap: 16rpx; margin-bottom: 16rpx; }
+.member-title { font-size: 34rpx; font-weight: 800; color: #1F2937; }
+.member-sub { font-size: 20rpx; color: #9CA3AF; flex: 1; }
+.member-more { font-size: 22rpx; color: #2563EB; }
+.tabs { white-space: nowrap; margin-bottom: 16rpx; }
+.tabs .tab {
+  display: inline-block; padding: 10rpx 24rpx; background: #ECEEF2; border-radius: 32rpx;
+  font-size: 22rpx; color: #6B7280; margin-right: 16rpx;
+  &.active { background: #DBE7FF; color: #2563EB; }
 }
-.benefit-img { width: 100%; height: 160rpx; }
-.benefit-meta { padding: 16rpx 20rpx 20rpx; }
-.benefit-title { font-size: 26rpx; color: #1F2937; }
-.benefit-price { display: block; color: #DC2626; font-weight: 700; font-size: 30rpx; margin-top: 8rpx; }
-.benefit-ori { color: #9CA3AF; font-size: 22rpx; font-weight: 400; text-decoration: line-through; margin-left: 8rpx; }
-
-.vip-card {
-  background: linear-gradient(135deg, #1F2937, #4B5563);
-  border-radius: 24rpx; padding: 32rpx;
-  display: flex; align-items: center; justify-content: space-between; color: #fff;
+.products { white-space: nowrap; }
+.product {
+  display: inline-block; width: 220rpx; margin-right: 16rpx; background: #fff; border-radius: 16rpx; overflow: hidden;
+  .p-img { width: 220rpx; height: 220rpx; display: block; }
+  .p-info { padding: 12rpx; }
+  .p-name { display: block; font-size: 22rpx; color: #1F2937; }
+  .p-price { display: block; font-size: 26rpx; color: #DC2626; font-weight: 700; margin-top: 6rpx; }
 }
-.vip-left { display: flex; flex-direction: column; gap: 8rpx; }
-.vip-title { font-size: 32rpx; font-weight: 700; }
-.vip-sub { font-size: 24rpx; opacity: .85; }
-.vip-btn {
-  margin-top: 16rpx;
-  background: linear-gradient(135deg,#fbbf24,#d97706);
-  color: #1F2937; padding: 12rpx 28rpx;
-  border-radius: 999rpx; font-size: 24rpx; font-weight: 700; align-self: flex-start;
-}
-.vip-emoji { font-size: 80rpx; }
-
-.tabbar {
-  position: fixed; left: 0; right: 0; bottom: 0;
-  height: 110rpx; background: #fff;
-  display: flex; border-top: 1rpx solid #E5E7EB;
-  box-shadow: 0 -4rpx 12rpx rgba(0,0,0,.04);
-}
-.tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6B7280; }
-.tab-item.active { color: #1F2937; }
-.tab-emoji { font-size: 36rpx; }
-.tab-text { font-size: 22rpx; margin-top: 4rpx; }
 </style>

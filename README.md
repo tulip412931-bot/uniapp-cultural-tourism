@@ -25,25 +25,32 @@
 
 ## 运行
 
+### 方式 1：H5 开发模式（推荐，热更新）
+
 ```bash
-# 安装依赖
 npm install
-
-# H5 开发模式
 npm run dev:h5
-
-# H5 生产构建（产物在 dist/build/h5）
-npm run build:h5
-
-# 微信小程序（需安装微信开发者工具，并把 dist/dev/mp-weixin 导入）
-npm run dev:mp-weixin
+# 启动后浏览器打开 http://localhost:5173/
 ```
 
-H5 构建完成后可使用任意静态文件服务器预览：
+### 方式 2：H5 生产构建 + 预览
 
 ```bash
-cd dist/build/h5 && python3 -m http.server 3000
-# 浏览器访问 http://localhost:3000/
+npm install
+npm run build:h5     # 产物在 dist/build/h5
+npm run preview:h5   # 自动启动静态服务器 http://localhost:3000
+```
+
+> ⚠️ **不要直接双击 `dist/build/h5/index.html`**。Vue SPA 必须通过 HTTP 服务器访问，
+> 否则 `file://` 协议会导致页面空白（浏览器无法加载 ES Module）。
+> 已通过 `vite.config.js` 的 `base: './'` 让资源路径使用相对引用，
+> 但 SPA 仍需 http 服务器才能正确运行。
+
+### 方式 3：微信小程序 / App
+
+```bash
+npm run dev:mp-weixin   # 然后用微信开发者工具打开 dist/dev/mp-weixin
+npm run dev:app         # 在 HBuilderX 中真机运行
 ```
 
 ## 目录结构

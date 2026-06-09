@@ -3,75 +3,85 @@
     {
       "path": "pages/index/index",
       "style": {
-        "navigationBarTitleText": "文旅平台",
+        "navigationBarTitleText": "一江津彩",
         "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/hiking/list",
       "style": {
-        "navigationBarTitleText": "徒步线路"
+        "navigationBarTitleText": "徒步线路",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/hiking/detail",
       "style": {
-        "navigationBarTitleText": "线路详情"
+        "navigationBarTitleText": "线路详情",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/ticket/list",
       "style": {
-        "navigationBarTitleText": "景区门票"
+        "navigationBarTitleText": "景区门票",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/ticket/detail",
       "style": {
-        "navigationBarTitleText": "门票详情"
+        "navigationBarTitleText": "门票详情",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/hotel/list",
       "style": {
-        "navigationBarTitleText": "酒店民宿"
+        "navigationBarTitleText": "酒店民宿",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/hotel/detail",
       "style": {
-        "navigationBarTitleText": "酒店详情"
+        "navigationBarTitleText": "酒店详情",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/cultural/list",
       "style": {
-        "navigationBarTitleText": "文创周边"
+        "navigationBarTitleText": "文创周边",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/cultural/detail",
       "style": {
-        "navigationBarTitleText": "商品详情"
+        "navigationBarTitleText": "商品详情",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/guide/list",
       "style": {
-        "navigationBarTitleText": "游玩攻略"
+        "navigationBarTitleText": "游玩攻略",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/guide/detail",
       "style": {
-        "navigationBarTitleText": "攻略详情"
+        "navigationBarTitleText": "攻略详情",
+        "navigationStyle": "custom"
       }
     }
   ],
   "globalStyle": {
-    "navigationBarTextStyle": "white",
-    "navigationBarTitleText": "文旅平台",
-    "navigationBarBackgroundColor": "#1F2937",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "一江津彩",
+    "navigationBarBackgroundColor": "#FFFFFF",
     "backgroundColor": "#F3F4F6"
   }
 }
