@@ -2,15 +2,19 @@
   <view v-if="item" class="page">
     <!-- 顶部图 + 浮动 nav -->
     <view class="hero-wrap">
-      <image class="hero-img" :src="item.cover" mode="aspectFill" />
+      <swiper class="hero-swiper" :indicator-dots="false" :autoplay="true" :interval="4000" :duration="500" :circular="true" @change="onSwipe">
+        <swiper-item v-for="(img, i) in heroImages" :key="i">
+          <image class="hero-img" :src="img" mode="aspectFill" />
+        </swiper-item>
+      </swiper>
       <view class="hero-nav">
         <view class="nav-btn" @click="back">‹</view>
         <view class="nav-right">
-          <view class="nav-btn">⤴</view>
-          <view class="nav-btn">♡</view>
+          <view class="nav-btn" @click="onShare">⤴</view>
+          <view class="nav-btn" :class="{ liked }" @click="toggleLike">{{ liked ? '♥' : '♡' }}</view>
         </view>
       </view>
-      <view class="page-indicator">1/4</view>
+      <view class="page-indicator">{{ heroIndex + 1 }}/{{ heroImages.length }}</view>
     </view>
 
     <!-- 标题区 -->
@@ -36,7 +40,7 @@
       </view>
       <view class="loc-row">
         <text class="loc">📍 {{ item.location }}</text>
-        <text class="nav-link">📍 导航</text>
+        <text class="nav-link" @click="onNavigate">📍 导航</text>
       </view>
       <view class="tag-row">
         <text class="tag" v-for="(t, i) in item.tags" :key="i" :class="tagClass(i)">{{ t }}</text>
@@ -61,9 +65,9 @@
     <view class="section">
       <view class="sec-head">
         <text class="sec-title">线路地图</text>
-        <text class="sec-more">查看全图 ›</text>
+        <text class="sec-more" @click="onFullMap">查看全图 ›</text>
       </view>
-      <image class="map-img" src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=70" mode="aspectFill" />
+      <image class="map-img" src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=70" mode="aspectFill" @click="onFullMap" />
     </view>
 
     <!-- 行程安排 -->
@@ -97,7 +101,7 @@
     <view class="section">
       <view class="sec-head">
         <text class="sec-title">用户评价</text>
-        <text class="sec-more">全部评价 ›</text>
+        <text class="sec-more" @click="onAllReviews">全部评价 ›</text>
       </view>
       <view class="review" v-for="(r, i) in item.reviews" :key="i">
         <view class="r-head">
@@ -110,7 +114,7 @@
         </view>
         <text class="r-content">{{ r.content }}</text>
         <view v-if="r.images && r.images.length" class="r-imgs">
-          <image v-for="(img, j) in r.images" :key="j" :src="img" class="r-img" mode="aspectFill" />
+          <image v-for="(img, j) in r.images" :key="j" :src="img" class="r-img" mode="aspectFill" @click="previewImg(r.images, j)" />
         </view>
       </view>
     </view>
@@ -118,7 +122,7 @@
     <!-- 底部固定栏 -->
     <view class="footer">
       <text class="f-price"><text class="cur">¥{{ item.price }}</text><text class="unit">/人</text></text>
-      <view class="f-ic">🎧</view>
+      <view class="f-ic" @click="onService">🎧</view>
       <view class="f-book" @click="book">立即预订</view>
     </view>
     <view style="height: 140rpx"></view>
@@ -128,23 +132,44 @@
 <script setup>
 import { hikingRoutes, findById } from '@/common/data.js'
 import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const item = ref(null)
+const heroIndex = ref(0)
+const liked = ref(false)
+const heroImages = computed(() => {
+  if (!item.value) return []
+  const c = item.value.cover
+  return [c,
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=70',
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=70',
+    'https://images.unsplash.com/photo-1502786129293-79981df4e689?w=800&q=70']
+})
+
 onLoad((q) => { item.value = findById(hikingRoutes, q.id) || hikingRoutes[0] })
 
 function tagClass (i) { return ['t-green', 't-purple', 't-orange', 't-blue'][i % 4] }
 function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/hiking/list' }) }) }
 function book () { uni.showToast({ title: '预订成功（演示）', icon: 'success' }) }
+function onSwipe (e) { heroIndex.value = e.detail.current }
+function toggleLike () { liked.value = !liked.value; uni.showToast({ title: liked.value ? '已收藏' : '取消收藏', icon: 'none' }) }
+function onShare () { uni.showActionSheet({ itemList: ['微信好友','朋友圈','复制链接'], success: () => uni.showToast({ title: '分享成功', icon: 'success' }) }) }
+function onNavigate () { uni.showToast({ title: `正在为您导航到 ${item.value?.location || ''}`, icon: 'none' }) }
+function onFullMap () { uni.previewImage({ urls: ['https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80'] }) }
+function onAllReviews () { uni.showToast({ title: '加载全部评价', icon: 'none' }) }
+function previewImg (urls, i) { uni.previewImage({ urls, current: urls[i] }) }
+function onService () { uni.showToast({ title: '正在接通客服…', icon: 'none' }) }
 </script>
 
 <style lang="scss" scoped>
 .page { background: #F3F4F6; min-height: 100vh; padding-bottom: 0; }
 .hero-wrap { position: relative; height: 480rpx; }
+.hero-swiper { width: 100%; height: 100%; }
 .hero-img { width: 100%; height: 100%; display: block; }
-.hero-nav { position: absolute; top: env(safe-area-inset-top); left: 0; right: 0; display: flex; justify-content: space-between; padding: 20rpx 24rpx; }
+.hero-nav { position: absolute; top: env(safe-area-inset-top); left: 0; right: 0; display: flex; justify-content: space-between; padding: 20rpx 24rpx; z-index: 2; }
 .nav-right { display: flex; gap: 16rpx; }
 .nav-btn { width: 60rpx; height: 60rpx; border-radius: 50%; background: rgba(255,255,255,.85); display: flex; align-items: center; justify-content: center; font-size: 32rpx; color: #1F2937; }
+.nav-btn.liked { color: #DC2626; }
 .page-indicator { position: absolute; bottom: 20rpx; right: 24rpx; background: rgba(0,0,0,.5); color: #fff; padding: 4rpx 14rpx; border-radius: 16rpx; font-size: 20rpx; }
 
 .head-block { background: #fff; padding: 24rpx; margin-bottom: 16rpx; }

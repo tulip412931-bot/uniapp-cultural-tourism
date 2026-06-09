@@ -4,12 +4,12 @@
       <view class="nav-btn" @click="back">‹</view>
       <text class="nav-title">攻略详情</text>
       <view class="nav-right">
-        <view class="nav-btn">⤴</view>
-        <view class="nav-btn">⋯</view>
+        <view class="nav-btn" @click="onShare">⤴</view>
+        <view class="nav-btn" @click="onMore">⋯</view>
       </view>
     </view>
 
-    <image class="hero" :src="item.cover" mode="aspectFill" />
+    <image class="hero" :src="item.cover" mode="aspectFill" @click="previewImg([item.cover])" />
 
     <view class="head">
       <text class="title">{{ item.title }}</text>
@@ -19,7 +19,7 @@
           <text class="a-name">{{ item.author }}</text>
           <text class="a-desc">{{ item.authorDesc || '资深旅行家' }}</text>
         </view>
-        <view class="follow">+ 关注</view>
+        <view class="follow" :class="{ followed }" @click="toggleFollow">{{ followed ? '已关注' : '+ 关注' }}</view>
       </view>
       <view class="meta">
         <text>📅 {{ item.date }}</text>
@@ -76,7 +76,7 @@
     <view class="section" v-if="item.musts && item.musts.length">
       <view class="bh"><text class="bh-num">3</text><text class="bh-title">必打卡景点详解</text></view>
       <view class="must" v-for="(m, i) in item.musts" :key="i">
-        <image class="m-img" :src="m.cover" mode="aspectFill" />
+        <image class="m-img" :src="m.cover" mode="aspectFill" @click="previewImg([m.cover])" />
         <view class="m-body">
           <view class="m-head">
             <text class="m-title">{{ m.title }}</text>
@@ -118,9 +118,9 @@
 
     <!-- 互动 -->
     <view class="interact">
-      <view class="ia"><text>👍</text><text>{{ item.likes }}</text></view>
-      <view class="ia"><text>⭐</text><text>{{ item.favorites || item.likes }}</text></view>
-      <view class="ia"><text>💬</text><text>368</text></view>
+      <view class="ia" :class="{ on: liked }" @click="toggleLike"><text>👍</text><text>{{ likeCount }}</text></view>
+      <view class="ia" :class="{ on: faved }" @click="toggleFav"><text>⭐</text><text>{{ favCount }}</text></view>
+      <view class="ia" @click="onComment"><text>💬</text><text>{{ commentCount }}</text></view>
     </view>
 
     <!-- 相关攻略推荐 -->
@@ -138,10 +138,10 @@
     <view style="height: 140rpx"></view>
 
     <view class="footer">
-      <view class="f-ic">👍</view>
-      <view class="f-ic">⭐</view>
-      <view class="f-ic">💬</view>
-      <view class="f-buy">查看全部368条评论</view>
+      <view class="f-ic" :class="{ on: liked }" @click="toggleLike">👍</view>
+      <view class="f-ic" :class="{ on: faved }" @click="toggleFav">⭐</view>
+      <view class="f-ic" @click="onService">🎧</view>
+      <view class="f-buy" @click="onComment">查看全部{{ commentCount }}条评论</view>
     </view>
   </view>
 </template>
@@ -152,12 +152,31 @@ import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
 const item = ref(null)
-onLoad((q) => { item.value = findById(guides, q.id) || guides[0] })
+const followed = ref(false)
+const liked = ref(false)
+const faved = ref(false)
+const likeCount = ref(0)
+const favCount = ref(0)
+const commentCount = ref(368)
+
+onLoad((q) => {
+  item.value = findById(guides, q.id) || guides[0]
+  likeCount.value = item.value.likes || 0
+  favCount.value = item.value.favorites || item.value.likes || 0
+})
 
 function tagClass (i) { return ['t-green', 't-blue', 't-pink', 't-purple'][i % 4] }
 function foodColor (i) { return ['fc-orange', 'fc-pink', 'fc-yellow'][i % 3] }
 function goItem (id) { uni.redirectTo({ url: `/pages/guide/detail?id=${id}` }) }
 function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/guide/list' }) }) }
+function onShare () { uni.showActionSheet({ itemList: ['微信好友','朋友圈','复制链接'], success: () => uni.showToast({ title: '分享成功', icon: 'success' }) }) }
+function onMore () { uni.showActionSheet({ itemList: ['举报','投诉','复制链接'], success: () => uni.showToast({ title: '操作成功', icon: 'none' }) }) }
+function previewImg (urls, i = 0) { uni.previewImage({ urls, current: urls[i] }) }
+function toggleFollow () { followed.value = !followed.value; uni.showToast({ title: followed.value ? `已关注 ${item.value.author}` : '已取消关注', icon: 'none' }) }
+function toggleLike () { liked.value = !liked.value; likeCount.value += liked.value ? 1 : -1; uni.showToast({ title: liked.value ? '已点赞' : '取消点赞', icon: 'none' }) }
+function toggleFav () { faved.value = !faved.value; favCount.value += faved.value ? 1 : -1; uni.showToast({ title: faved.value ? '已收藏' : '取消收藏', icon: 'none' }) }
+function onComment () { uni.showToast({ title: '加载全部评论', icon: 'none' }) }
+function onService () { uni.showToast({ title: '正在接通客服…', icon: 'none' }) }
 </script>
 
 <style lang="scss" scoped>
@@ -177,6 +196,7 @@ function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/gu
 .a-name { display: block; font-size: 26rpx; color: #1F2937; font-weight: 600; }
 .a-desc { display: block; font-size: 20rpx; color: #6B7280; margin-top: 4rpx; }
 .follow { background: #EFF6FF; color: #2563EB; padding: 8rpx 20rpx; border-radius: 24rpx; font-size: 22rpx; }
+.follow.followed { background: #E5E7EB; color: #6B7280; }
 .meta { display: flex; gap: 20rpx; font-size: 22rpx; color: #6B7280; margin-bottom: 12rpx; }
 .tag-row { display: flex; gap: 12rpx; flex-wrap: wrap; }
 .tag { padding: 4rpx 14rpx; border-radius: 6rpx; font-size: 20rpx; }
@@ -241,6 +261,7 @@ function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/gu
 .interact { background: #fff; padding: 24rpx; display: flex; justify-content: space-around; margin-bottom: 16rpx; }
 .ia { display: flex; flex-direction: column; align-items: center; gap: 8rpx; font-size: 22rpx; color: #6B7280; }
 .ia text:first-child { font-size: 36rpx; }
+.ia.on { color: #DC2626; }
 
 .rel-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12rpx; }
 .rel { background: #F9FAFB; border-radius: 12rpx; overflow: hidden; padding-bottom: 12rpx; }
@@ -250,5 +271,6 @@ function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/gu
 
 .footer { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; padding: 16rpx 24rpx env(safe-area-inset-bottom); display: flex; align-items: center; gap: 12rpx; box-shadow: 0 -4rpx 16rpx rgba(0,0,0,.04); }
 .footer .f-ic { width: 64rpx; height: 64rpx; border-radius: 50%; background: #F3F4F6; display: flex; align-items: center; justify-content: center; font-size: 28rpx; }
+.footer .f-ic.on { background: #FEE2E2; color: #DC2626; }
 .f-buy { flex: 1; background: #2563EB; color: #fff; text-align: center; padding: 18rpx; border-radius: 40rpx; font-size: 24rpx; }
 </style>

@@ -3,10 +3,10 @@
     <view class="nav">
       <view class="nav-btn" @click="back">‹</view>
       <text class="nav-title">游玩攻略</text>
-      <view class="nav-btn">🔍</view>
+      <view class="nav-btn" @click="onSearch">🔍</view>
     </view>
 
-    <view class="search">
+    <view class="search" @click="onSearch">
       <text class="ic">🔍</text>
       <text class="ph">搜索攻略、景点、路线</text>
     </view>
@@ -29,7 +29,7 @@
     <view class="block">
       <view class="bh">
         <text class="bh-title">热门排行</text>
-        <text class="bh-more">更多 ›</text>
+        <text class="bh-more" @click="onMore('热门排行')">更多 ›</text>
       </view>
       <view class="rank-card" v-for="(g, i) in rankList" :key="g.id" @click="goDetail(g.id)">
         <view class="rank-num" :class="rankClass(i)">{{ i + 1 }}</view>
@@ -45,7 +45,7 @@
     <view class="block">
       <view class="bh">
         <text class="bh-title">最新攻略</text>
-        <text class="bh-sort">最新发布 ›</text>
+        <text class="bh-sort" @click="onSort">{{ sortLabel }} ›</text>
       </view>
       <view class="card" v-for="g in latest" :key="g.id" @click="goDetail(g.id)">
         <image class="c-img" :src="g.cover" mode="aspectFill" />
@@ -74,7 +74,7 @@
     <view class="block">
       <view class="bh"><text class="bh-bar"></text><text class="bh-title">主题攻略</text></view>
       <view class="theme-grid">
-        <view class="theme" v-for="t in themeGuides" :key="t.id" :style="{ background: t.color }">
+        <view class="theme" v-for="t in themeGuides" :key="t.id" :style="{ background: t.color }" @click="onTheme(t)">
           <text class="t-icon">{{ t.icon }}</text>
           <text class="t-name">{{ t.title }}</text>
           <text class="t-count">{{ t.count }}</text>
@@ -84,14 +84,14 @@
 
     <!-- 达人推荐 -->
     <view class="block">
-      <view class="bh"><text class="bh-title">达人推荐</text><text class="bh-more">更多 ›</text></view>
+      <view class="bh"><text class="bh-title">达人推荐</text><text class="bh-more" @click="onMore('达人推荐')">更多 ›</text></view>
       <scroll-view scroll-x class="experts">
-        <view class="expert" v-for="e in experts" :key="e.id">
+        <view class="expert" v-for="e in experts" :key="e.id" @click="onExpert(e)">
           <image class="e-cover" src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=300&q=70" mode="aspectFill" />
           <image class="e-ava" :src="e.avatar" mode="aspectFill" />
           <text class="e-name">{{ e.name }}</text>
           <text class="e-count">{{ e.count }}</text>
-          <view class="e-btn">+ 关注</view>
+          <view class="e-btn" :class="{ followed: followed[e.id] }" @click.stop="toggleFollow(e)">{{ followed[e.id] ? '已关注' : '+ 关注' }}</view>
         </view>
       </scroll-view>
     </view>
@@ -104,18 +104,45 @@
 <script setup>
 import { guides, themeGuides, experts } from '@/common/data.js'
 import TabBar from '@/components/TabBar.vue'
-import { ref } from 'vue'
+import { ref, reactive, computed } from 'vue'
 
-const chips = ['全部', '自然风光', '徒步探险', '美食探店', '人']
+const chips = ['全部', '自然风光', '徒步探险', '美食探店', '人文古迹']
 const activeChip = ref(0)
 const featured = guides[0]
 const rankList = guides.slice(1, 4)
-const latest = guides.slice(1)
+const sortLabel = ref('最新发布')
+const followed = reactive({})
+
+const latest = computed(() => {
+  const rest = guides.slice(1)
+  const c = chips[activeChip.value]
+  let arr = rest
+  if (c !== '全部') {
+    arr = rest.filter(g => (g.tags || []).some(t => t.includes(c) || c.includes(t)))
+    if (!arr.length) arr = rest
+  }
+  arr = [...arr]
+  if (sortLabel.value === '点赞最多') arr.sort((a, b) => (b.likes || 0) - (a.likes || 0))
+  else if (sortLabel.value === '浏览最多') arr.sort((a, b) => (b.views || 0) - (a.views || 0))
+  return arr
+})
 
 function rankClass (i) { return ['r-orange', 'r-pink', 'r-yellow'][i] || 'r-yellow' }
 function tagClass (i) { return ['t-green', 't-blue', 't-pink', 't-purple'][i % 4] }
 function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/index/index' }) }) }
 function goDetail (id) { uni.navigateTo({ url: `/pages/guide/detail?id=${id}` }) }
+function onSearch () { uni.showToast({ title: '搜索功能开发中', icon: 'none' }) }
+function onMore (name) { uni.showToast({ title: `更多${name}（演示）`, icon: 'none' }) }
+function onSort () {
+  const opts = ['最新发布', '点赞最多', '浏览最多']
+  uni.showActionSheet({ itemList: opts, success: (e) => { sortLabel.value = opts[e.tapIndex] } })
+}
+function onTheme (t) { uni.showToast({ title: `主题：${t.title}`, icon: 'none' }) }
+function onExpert (e) { uni.showToast({ title: `查看 ${e.name} 主页`, icon: 'none' }) }
+function toggleFollow (e) {
+  followed[e.id] = !followed[e.id]
+  uni.showToast({ title: followed[e.id] ? `已关注 ${e.name}` : `已取消关注`, icon: 'none' })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -188,4 +215,5 @@ function goDetail (id) { uni.navigateTo({ url: `/pages/guide/detail?id=${id}` })
 .e-name { display: block; font-size: 22rpx; color: #1F2937; font-weight: 600; margin-top: 8rpx; }
 .e-count { display: block; font-size: 18rpx; color: #6B7280; margin: 4rpx 0; }
 .e-btn { background: #EFF6FF; color: #2563EB; font-size: 20rpx; padding: 4rpx 16rpx; border-radius: 16rpx; display: inline-block; margin-top: 4rpx; }
+.e-btn.followed { background: #E5E7EB; color: #6B7280; }
 </style>

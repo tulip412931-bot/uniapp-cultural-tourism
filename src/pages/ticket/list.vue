@@ -3,15 +3,15 @@
     <view class="nav">
       <view class="nav-btn" @click="back">‹</view>
       <text class="nav-title">景区门票</text>
-      <view class="nav-btn">🔍</view>
+      <view class="nav-btn" @click="onSearch">🔍</view>
     </view>
 
     <!-- 顶部筛选 -->
     <view class="top-filters">
-      <text class="tf">全部区域 ▾</text>
-      <text class="tf">今天 ▾</text>
-      <text class="tf">推荐 ▾</text>
-      <text class="tf">▿ 筛选</text>
+      <text class="tf" @click="onTopFilter('区域', ['全部区域','重庆主城','江津主城','四面山镇','中山古镇'])">{{ region }} ▾</text>
+      <text class="tf" @click="onTopFilter('日期', ['今天','明天','后天','本周末'])">{{ date }} ▾</text>
+      <text class="tf" @click="onTopFilter('排序', ['推荐','人气','价格','评分'])">{{ sort }} ▾</text>
+      <text class="tf" @click="onFilter">▿ 筛选</text>
     </view>
 
     <!-- chips -->
@@ -22,7 +22,7 @@
     <!-- 热门推荐头 -->
     <view class="list-head">
       <text class="lh-title">热门推荐</text>
-      <text class="lh-more">更多 ›</text>
+      <text class="lh-more" @click="onMore">更多 ›</text>
     </view>
 
     <!-- 顶部大图卡片 -->
@@ -71,16 +71,41 @@
 <script setup>
 import { tickets } from '@/common/data.js'
 import TabBar from '@/components/TabBar.vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const chips = ['全部', '5A景区', '4A景区', '自然风光', '人文古迹']
 const activeChip = ref(0)
 const featured = tickets[0]
-const list = tickets.slice(1)
+const region = ref('全部区域')
+const date = ref('今天')
+const sort = ref('推荐')
+
+const list = computed(() => {
+  const rest = tickets.slice(1)
+  const c = chips[activeChip.value]
+  if (c === '全部') return rest
+  if (c === '5A景区') return rest.filter(t => (t.level || '').includes('5A'))
+  if (c === '4A景区') return rest.filter(t => (t.level || '').includes('4A'))
+  if (c === '自然风光') return rest.filter(t => (t.tags || []).some(x => x.includes('自然') || x.includes('山水')))
+  if (c === '人文古迹') return rest.filter(t => (t.tags || []).some(x => x.includes('古镇') || x.includes('教育') || x.includes('历史')))
+  return rest
+})
 
 function tagClass (i) { return ['t-blue', 't-purple', 't-green', 't-pink'][i % 4] }
 function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/index/index' }) }) }
 function goDetail (id) { uni.navigateTo({ url: `/pages/ticket/detail?id=${id}` }) }
+function onSearch () { uni.showToast({ title: '搜索功能开发中', icon: 'none' }) }
+function onTopFilter (label, opts) {
+  uni.showActionSheet({ itemList: opts, success: (e) => {
+    if (label === '区域') region.value = opts[e.tapIndex]
+    else if (label === '日期') date.value = opts[e.tapIndex]
+    else if (label === '排序') sort.value = opts[e.tapIndex]
+  } })
+}
+function onFilter () {
+  uni.showActionSheet({ itemList: ['价格：不限','¥0-50','¥50-100','¥100以上'], success: (e) => uni.showToast({ title: '已应用筛选', icon: 'none' }) })
+}
+function onMore () { uni.showToast({ title: '已为您展示更多', icon: 'none' }) }
 </script>
 
 <style lang="scss" scoped>

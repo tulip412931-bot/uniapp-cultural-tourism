@@ -3,10 +3,10 @@
     <view class="nav">
       <view class="nav-btn" @click="back">‹</view>
       <text class="nav-title">文创周边</text>
-      <view class="nav-btn cart">🛒<text class="dot">2</text></view>
+      <view class="nav-btn cart" @click="onCart">🛒<text class="dot">{{ cartCount }}</text></view>
     </view>
 
-    <view class="search">
+    <view class="search" @click="onSearch">
       <text class="ic">🔍</text>
       <text class="ph">搜索文创产品</text>
     </view>
@@ -15,7 +15,7 @@
       <view class="chip" v-for="(c, i) in chips" :key="i" :class="{ active: i === activeChip }" @click="activeChip = i">{{ c }}</view>
     </scroll-view>
 
-    <view class="hero">
+    <view class="hero" @click="onHeroBanner">
       <image class="hero-img" src="https://images.unsplash.com/photo-1545569310-ab0fb6efeec7?w=800&q=70" mode="aspectFill" />
     </view>
 
@@ -24,7 +24,7 @@
       <view class="block-head">
         <text class="bh-bar"></text>
         <text class="bh-title">热销专区</text>
-        <text class="bh-more">更多 ›</text>
+        <text class="bh-more" @click="onMore('热销专区')">更多 ›</text>
       </view>
       <view class="grid">
         <view class="prod" v-for="item in hot" :key="item.id" @click="goDetail(item.id)">
@@ -46,7 +46,7 @@
       <view class="block-head">
         <text class="bh-bar"></text>
         <text class="bh-title">新品上市</text>
-        <text class="bh-more">更多 ›</text>
+        <text class="bh-more" @click="onMore('新品上市')">更多 ›</text>
       </view>
       <view class="grid">
         <view class="prod" v-for="item in fresh" :key="item.id" @click="goDetail(item.id)">
@@ -74,15 +74,37 @@
 <script setup>
 import { cultural } from '@/common/data.js'
 import TabBar from '@/components/TabBar.vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 
 const chips = ['全部', '非遗手作', '特色食品', '创意文具']
 const activeChip = ref(0)
-const hot = cultural.slice(0, 4)
-const fresh = cultural.slice(4)
+const cartCount = ref(2)
+const filtered = computed(() => {
+  const c = chips[activeChip.value]
+  if (c === '全部') return cultural
+  return cultural.filter(it => (it.category || '') === c)
+})
+const hot = computed(() => filtered.value.slice(0, 4))
+const fresh = computed(() => filtered.value.slice(4))
+
+onLoad((q) => {
+  if (q && q.cat) {
+    const map = { '食': '特色食品', '非遗': '非遗手作', '好物': '全部', '乡珍': '特色食品' }
+    const c = map[q.cat]
+    if (c) {
+      const idx = chips.indexOf(c)
+      if (idx >= 0) activeChip.value = idx
+    }
+  }
+})
 
 function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/index/index' }) }) }
 function goDetail (id) { uni.navigateTo({ url: `/pages/cultural/detail?id=${id}` }) }
+function onCart () { uni.showToast({ title: `购物车：${cartCount.value} 件`, icon: 'none' }) }
+function onSearch () { uni.showToast({ title: '搜索功能开发中', icon: 'none' }) }
+function onHeroBanner () { uni.showToast({ title: '已为您展示活动详情', icon: 'none' }) }
+function onMore (name) { uni.showToast({ title: `更多${name}（演示）`, icon: 'none' }) }
 </script>
 
 <style lang="scss" scoped>

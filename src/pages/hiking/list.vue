@@ -4,11 +4,11 @@
     <view class="nav">
       <view class="nav-btn" @click="back">‹</view>
       <text class="nav-title">徒步线路</text>
-      <view class="nav-btn">≡</view>
+      <view class="nav-btn" @click="onFilter">≡</view>
     </view>
 
     <!-- 搜索 -->
-    <view class="search">
+    <view class="search" @click="onSearch">
       <text class="ic">🔍</text>
       <text class="ph">搜索徒步线路名称</text>
     </view>
@@ -34,10 +34,13 @@
     <!-- 列表标题 -->
     <view class="list-head">
       <text class="lh-title">全部线路</text>
-      <text class="lh-sort">推荐排序 ›</text>
+      <text class="lh-sort" @click="onSort">{{ sortLabel }} ›</text>
     </view>
 
     <!-- 列表 -->
+    <view class="empty" v-if="!list.length">
+      <text>暂无符合条件的线路</text>
+    </view>
     <view class="card" v-for="item in list" :key="item.id" @click="goDetail(item.id)">
       <image class="card-img" :src="item.cover" mode="aspectFill" />
       <view class="card-body">
@@ -68,16 +71,45 @@
 <script setup>
 import { hikingRoutes } from '@/common/data.js'
 import TabBar from '@/components/TabBar.vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const chips = ['全部', '1-3公里', '3-8公里', '8公里以上']
 const activeChip = ref(0)
 const featured = hikingRoutes[0]
-const list = hikingRoutes.slice(1)
+const sortLabel = ref('推荐排序')
+
+const filteredAll = computed(() => {
+  const rest = hikingRoutes.slice(1)
+  const c = chips[activeChip.value]
+  const inRange = (km, lo, hi) => km >= lo && km <= hi
+  if (c === '全部') return rest
+  return rest.filter(it => {
+    const km = parseFloat(String(it.distance).replace(/[^0-9.]/g, '')) || 0
+    if (c === '1-3公里') return inRange(km, 1, 3)
+    if (c === '3-8公里') return inRange(km, 3, 8)
+    if (c === '8公里以上') return km >= 8
+    return true
+  })
+})
+const list = computed(() => {
+  const arr = [...filteredAll.value]
+  if (sortLabel.value === '价格从低到高') arr.sort((a,b)=>a.price-b.price)
+  else if (sortLabel.value === '价格从高到低') arr.sort((a,b)=>b.price-a.price)
+  else if (sortLabel.value === '评分最高') arr.sort((a,b)=>b.rating-a.rating)
+  return arr
+})
 
 function tagClass (i) { return ['t-green', 't-purple', 't-orange', 't-blue'][i % 4] }
 function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/index/index' }) }) }
 function goDetail (id) { uni.navigateTo({ url: `/pages/hiking/detail?id=${id}` }) }
+function onFilter () {
+  uni.showActionSheet({ itemList: ['难度：全部','难度：简单','难度：中等','难度：困难'], success: (e) => uni.showToast({ title: '已应用：' + ['全部','简单','中等','困难'][e.tapIndex], icon: 'none' }) })
+}
+function onSearch () { uni.showToast({ title: '搜索功能开发中', icon: 'none' }) }
+function onSort () {
+  const opts = ['推荐排序','价格从低到高','价格从高到低','评分最高']
+  uni.showActionSheet({ itemList: opts, success: (e) => { sortLabel.value = opts[e.tapIndex] } })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -117,6 +149,7 @@ function goDetail (id) { uni.navigateTo({ url: `/pages/hiking/detail?id=${id}` }
 .list-head { display: flex; justify-content: space-between; align-items: center; padding: 8rpx 28rpx 16rpx; }
 .lh-title { font-size: 32rpx; font-weight: 700; color: #1F2937; }
 .lh-sort { font-size: 24rpx; color: #6B7280; }
+.empty { text-align: center; padding: 80rpx 0; color: #9CA3AF; font-size: 26rpx; }
 
 .card {
   margin: 0 24rpx 24rpx; background: #fff; border-radius: 20rpx; overflow: hidden;

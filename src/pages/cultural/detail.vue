@@ -4,15 +4,19 @@
       <view class="nav-btn" @click="back">‹</view>
       <text class="nav-title">商品详情</text>
       <view class="nav-right">
-        <view class="nav-btn">⤴</view>
-        <view class="nav-btn">⋯</view>
+        <view class="nav-btn" @click="onShare">⤴</view>
+        <view class="nav-btn" @click="onMore">⋯</view>
       </view>
     </view>
 
     <!-- 顶图 -->
     <view class="hero-wrap">
-      <image class="hero-img" :src="item.cover" mode="aspectFill" />
-      <view class="indicator">1/{{ (item.images || [item.cover]).length }}</view>
+      <swiper class="hero-swiper" :indicator-dots="false" :autoplay="true" :interval="4000" :circular="true" @change="onSwipe">
+        <swiper-item v-for="(img, i) in heroImages" :key="i">
+          <image class="hero-img" :src="img" mode="aspectFill" @click="previewImg(heroImages, i)" />
+        </swiper-item>
+      </swiper>
+      <view class="indicator">{{ heroIndex + 1 }}/{{ heroImages.length }}</view>
     </view>
 
     <!-- 价格区 -->
@@ -28,28 +32,28 @@
         <text>⭐ {{ item.rating }}</text>
         <text>热销{{ item.sold }}</text>
         <text v-for="(t, i) in item.tags" :key="i" class="tag" :class="tagClass(i)">{{ t }}</text>
-        <text class="reviews-link">评价 {{ item.reviews }}</text>
+        <text class="reviews-link" @click="onAllReviews">评价 {{ item.reviews }}</text>
       </view>
     </view>
 
     <!-- 优惠促销 -->
-    <view class="promo" v-if="item.promo">
+    <view class="promo" v-if="item.promo" @click="onPromo">
       <text class="p-tag">促销</text>
       <text class="p-txt">{{ item.promo }}</text>
     </view>
 
     <!-- 规格 -->
-    <view class="row-info">
+    <view class="row-info" @click="onSpec">
       <text class="ri-lbl">规格选择</text>
-      <text class="ri-val">{{ item.spec }}</text>
+      <text class="ri-val">{{ selectedSpec || item.spec }}</text>
       <text class="ri-arr">›</text>
     </view>
-    <view class="row-info">
+    <view class="row-info" @click="onShipping">
       <text class="ri-lbl">配送信息</text>
       <text class="ri-val">{{ item.shipping }}</text>
       <text class="ri-arr">›</text>
     </view>
-    <view class="row-info" v-if="item.guarantee && item.guarantee.length">
+    <view class="row-info" v-if="item.guarantee && item.guarantee.length" @click="onGuarantee">
       <text class="ri-lbl">保障服务</text>
       <view class="ri-tags">
         <text class="g-tag" v-for="(g, i) in item.guarantee" :key="i">✓ {{ g }}</text>
@@ -68,10 +72,7 @@
     <view class="section" v-if="item.reviews_list && item.reviews_list.length">
       <view class="bh"><text class="bh-bar"></text><text class="bh-title">用户评价 ({{ item.reviews }})</text></view>
       <view class="rate-tabs">
-        <text class="rt active">全部({{ item.reviews }})</text>
-        <text class="rt">好评(5200)</text>
-        <text class="rt">有图(1890)</text>
-        <text class="rt">追评(320)</text>
+        <text class="rt" v-for="(t, i) in rateTabs" :key="i" :class="{ active: i === activeRate }" @click="activeRate = i">{{ t }}</text>
         <text class="rt-rate">好评率98%</text>
       </view>
       <view class="review" v-for="(r, i) in item.reviews_list" :key="i">
@@ -85,14 +86,14 @@
         </view>
         <text class="r-content">{{ r.content }}</text>
         <view v-if="r.images && r.images.length" class="r-imgs">
-          <image v-for="(img, j) in r.images" :key="j" :src="img" class="r-imgi" mode="aspectFill" />
+          <image v-for="(img, j) in r.images" :key="j" :src="img" class="r-imgi" mode="aspectFill" @click="previewImg(r.images, j)" />
         </view>
         <view class="r-foot">
           <text class="r-spec">规格：{{ r.spec }}</text>
-          <text class="r-likes">👍 {{ r.likes }}</text>
+          <text class="r-likes" @click="onReviewLike(r)">👍 {{ r.likes }}</text>
         </view>
       </view>
-      <view class="all-reviews">查看全部{{ item.reviews }}条评价 ›</view>
+      <view class="all-reviews" @click="onAllReviews">查看全部{{ item.reviews }}条评价 ›</view>
     </view>
 
     <!-- 相关推荐 -->
@@ -112,9 +113,9 @@
 
     <!-- 底部 -->
     <view class="footer">
-      <view class="f-ic">🏠</view>
-      <view class="f-ic"><text>🛒</text><text class="cart-dot">2</text></view>
-      <view class="f-ic">⭐</view>
+      <view class="f-ic" @click="goHome">🏠</view>
+      <view class="f-ic" @click="goCart"><text>🛒</text><text class="cart-dot">{{ cartCount }}</text></view>
+      <view class="f-ic" :class="{ faved }" @click="toggleFav">{{ faved ? '★' : '⭐' }}</view>
       <view class="f-add" @click="add">加入购物车</view>
       <view class="f-buy" @click="buy">立即购买</view>
     </view>
@@ -125,17 +126,47 @@
 <script setup>
 import { cultural, findById } from '@/common/data.js'
 import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const item = ref(null)
+const heroIndex = ref(0)
+const cartCount = ref(2)
+const faved = ref(false)
+const selectedSpec = ref('')
+const activeRate = ref(0)
+const rateTabs = computed(() => item.value ? [`全部(${item.value.reviews})`, '好评(5200)', '有图(1890)', '追评(320)'] : [])
+const heroImages = computed(() => {
+  if (!item.value) return []
+  const imgs = item.value.images && item.value.images.length ? item.value.images : [item.value.cover]
+  return imgs
+})
 const related = cultural.filter(c => c.id !== 'c1').slice(0, 2)
+
 onLoad((q) => { item.value = findById(cultural, q.id) || cultural[0] })
 
 function tagClass (i) { return ['t-orange', 't-blue', 't-green'][i % 3] }
 function goItem (id) { uni.redirectTo({ url: `/pages/cultural/detail?id=${id}` }) }
 function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/cultural/list' }) }) }
-function add () { uni.showToast({ title: '已加入购物车', icon: 'success' }) }
+function add () { cartCount.value += 1; uni.showToast({ title: '已加入购物车', icon: 'success' }) }
 function buy () { uni.showToast({ title: '订单已生成（演示）', icon: 'success' }) }
+function onSwipe (e) { heroIndex.value = e.detail.current }
+function onShare () { uni.showActionSheet({ itemList: ['微信好友','朋友圈','复制链接'], success: () => uni.showToast({ title: '分享成功', icon: 'success' }) }) }
+function onMore () { uni.showActionSheet({ itemList: ['举报','投诉','复制链接'], success: () => uni.showToast({ title: '操作成功', icon: 'none' }) }) }
+function previewImg (urls, i) { uni.previewImage({ urls, current: urls[i] }) }
+function onPromo () { uni.showToast({ title: item.value.promo, icon: 'none' }) }
+function onSpec () {
+  uni.showActionSheet({ itemList: ['标准装','礼盒装','尝鲜装','大礼包'], success: (e) => {
+    selectedSpec.value = ['标准装','礼盒装','尝鲜装','大礼包'][e.tapIndex]
+    uni.showToast({ title: `已选：${selectedSpec.value}`, icon: 'none' })
+  } })
+}
+function onShipping () { uni.showToast({ title: item.value.shipping, icon: 'none' }) }
+function onGuarantee () { uni.showToast({ title: `保障：${(item.value.guarantee || []).join('、')}`, icon: 'none' }) }
+function onAllReviews () { uni.showToast({ title: `加载全部评价`, icon: 'none' }) }
+function onReviewLike (r) { r.likes = (r.likes || 0) + 1; uni.showToast({ title: '已点赞', icon: 'none' }) }
+function goHome () { uni.reLaunch({ url: '/pages/index/index' }) }
+function goCart () { uni.showToast({ title: `购物车 ${cartCount.value} 件`, icon: 'none' }) }
+function toggleFav () { faved.value = !faved.value; uni.showToast({ title: faved.value ? '已收藏' : '取消收藏', icon: 'none' }) }
 </script>
 
 <style lang="scss" scoped>
@@ -146,6 +177,7 @@ function buy () { uni.showToast({ title: '订单已生成（演示）', icon: 's
 .nav-right { display: flex; gap: 12rpx; }
 
 .hero-wrap { position: relative; }
+.hero-swiper { width: 100%; height: 600rpx; }
 .hero-img { width: 100%; height: 600rpx; display: block; }
 .indicator { position: absolute; bottom: 20rpx; right: 24rpx; background: rgba(0,0,0,.5); color: #fff; padding: 4rpx 14rpx; border-radius: 16rpx; font-size: 20rpx; }
 
@@ -210,6 +242,7 @@ function buy () { uni.showToast({ title: '订单已生成（演示）', icon: 's
 
 .footer { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; padding: 16rpx 24rpx env(safe-area-inset-bottom); display: flex; align-items: center; gap: 12rpx; box-shadow: 0 -4rpx 16rpx rgba(0,0,0,.04); }
 .f-ic { width: 64rpx; height: 64rpx; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28rpx; color: #4B5563; position: relative; }
+.f-ic.faved { color: #F59E0B; }
 .cart-dot { position: absolute; top: -4rpx; right: -4rpx; background: #DC2626; color: #fff; font-size: 16rpx; border-radius: 16rpx; min-width: 28rpx; height: 28rpx; line-height: 28rpx; text-align: center; padding: 0 6rpx; }
 .f-add { flex: 1; background: #F59E0B; color: #fff; text-align: center; padding: 20rpx; border-radius: 40rpx; font-size: 26rpx; font-weight: 700; }
 .f-buy { flex: 1; background: #DC2626; color: #fff; text-align: center; padding: 20rpx; border-radius: 40rpx; font-size: 26rpx; font-weight: 700; }

@@ -1,15 +1,19 @@
 <template>
   <view v-if="item" class="page">
     <view class="hero-wrap">
-      <image class="hero-img" :src="item.cover" mode="aspectFill" />
+      <swiper class="hero-swiper" :indicator-dots="false" :autoplay="true" :interval="4000" :duration="500" :circular="true" @change="onSwipe">
+        <swiper-item v-for="(img, i) in heroImages" :key="i">
+          <image class="hero-img" :src="img" mode="aspectFill" />
+        </swiper-item>
+      </swiper>
       <view class="hero-nav">
         <view class="nav-btn" @click="back">‹</view>
         <view class="nav-right">
-          <view class="nav-btn">⤴</view>
-          <view class="nav-btn">♡</view>
+          <view class="nav-btn" @click="onShare">⤴</view>
+          <view class="nav-btn" :class="{ liked }" @click="toggleLike">{{ liked ? '♥' : '♡' }}</view>
         </view>
       </view>
-      <view class="page-indicator">1/6</view>
+      <view class="page-indicator">{{ heroIndex + 1 }}/{{ heroImages.length }}</view>
     </view>
 
     <view class="head">
@@ -56,7 +60,7 @@
         </view>
         <text class="t-tip">{{ t.tips }}</text>
         <text v-if="t.originalPrice" class="t-ori">¥{{ t.originalPrice }}</text>
-        <view class="t-pick">选择使用日期</view>
+        <view class="t-pick" @click="pickDate(t)">选择使用日期 {{ pickedDate || '' }}</view>
       </view>
     </view>
 
@@ -74,7 +78,7 @@
     <view class="section" v-if="item.reviews && item.reviews.length">
       <view class="sec-head">
         <text class="sec-title">用户评价</text>
-        <text class="sec-more">全部评价 ›</text>
+        <text class="sec-more" @click="onAllReviews">全部评价 ›</text>
       </view>
       <view class="review" v-for="(r, i) in item.reviews" :key="i">
         <view class="r-head">
@@ -87,14 +91,14 @@
         </view>
         <text class="r-content">{{ r.content }}</text>
         <view v-if="r.images && r.images.length" class="r-imgs">
-          <image v-for="(img, j) in r.images" :key="j" :src="img" class="r-img" mode="aspectFill" />
+          <image v-for="(img, j) in r.images" :key="j" :src="img" class="r-img" mode="aspectFill" @click="previewImg(r.images, j)" />
         </view>
       </view>
     </view>
 
     <view class="footer">
       <text class="f-price"><text class="cur">¥{{ item.price }}</text><text class="unit">/人起</text></text>
-      <view class="f-ic">🎧</view>
+      <view class="f-ic" @click="onService">🎧</view>
       <view class="f-book" @click="book">立即预订</view>
     </view>
     <view style="height: 140rpx"></view>
@@ -104,23 +108,57 @@
 <script setup>
 import { tickets, findById } from '@/common/data.js'
 import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const item = ref(null)
+const heroIndex = ref(0)
+const liked = ref(false)
+const pickedDate = ref('')
+const heroImages = computed(() => {
+  if (!item.value) return []
+  const c = item.value.cover
+  return [c,
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=70',
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=70',
+    'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=70',
+    'https://images.unsplash.com/photo-1502786129293-79981df4e689?w=800&q=70',
+    'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=70']
+})
+
 onLoad((q) => { item.value = findById(tickets, q.id) || tickets[0] })
 
 function tagClass (i) { return ['t-green', 't-purple', 't-pink', 't-blue'][i % 4] }
 function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/ticket/list' }) }) }
-function book () { uni.showToast({ title: '预订成功（演示）', icon: 'success' }) }
+function book () {
+  if (!pickedDate.value) { uni.showToast({ title: '请先选择使用日期', icon: 'none' }); return }
+  uni.showToast({ title: '预订成功（演示）', icon: 'success' })
+}
+function onSwipe (e) { heroIndex.value = e.detail.current }
+function toggleLike () { liked.value = !liked.value; uni.showToast({ title: liked.value ? '已收藏' : '取消收藏', icon: 'none' }) }
+function onShare () { uni.showActionSheet({ itemList: ['微信好友','朋友圈','复制链接'], success: () => uni.showToast({ title: '分享成功', icon: 'success' }) }) }
+function pickDate (t) {
+  const today = new Date()
+  const start = today.toISOString().slice(0, 10)
+  uni.showDatePicker ? uni.showDatePicker({ start, success: (e) => pickedDate.value = e.value }) :
+    uni.showActionSheet({ itemList: ['今天','明天','后天','本周末'], success: (e) => {
+      const d = new Date(today); d.setDate(today.getDate() + [0,1,2,6][e.tapIndex])
+      pickedDate.value = d.toISOString().slice(0, 10)
+    } })
+}
+function onAllReviews () { uni.showToast({ title: '加载全部评价', icon: 'none' }) }
+function previewImg (urls, i) { uni.previewImage({ urls, current: urls[i] }) }
+function onService () { uni.showToast({ title: '正在接通客服…', icon: 'none' }) }
 </script>
 
 <style lang="scss" scoped>
 .page { background: #F3F4F6; min-height: 100vh; }
 .hero-wrap { position: relative; height: 480rpx; }
+.hero-swiper { width: 100%; height: 100%; }
 .hero-img { width: 100%; height: 100%; display: block; }
-.hero-nav { position: absolute; top: env(safe-area-inset-top); left: 0; right: 0; display: flex; justify-content: space-between; padding: 20rpx 24rpx; }
+.hero-nav { position: absolute; top: env(safe-area-inset-top); left: 0; right: 0; display: flex; justify-content: space-between; padding: 20rpx 24rpx; z-index: 2; }
 .nav-right { display: flex; gap: 16rpx; }
 .nav-btn { width: 60rpx; height: 60rpx; border-radius: 50%; background: rgba(255,255,255,.85); display: flex; align-items: center; justify-content: center; font-size: 32rpx; color: #1F2937; }
+.nav-btn.liked { color: #DC2626; }
 .page-indicator { position: absolute; bottom: 20rpx; right: 24rpx; background: rgba(0,0,0,.5); color: #fff; padding: 4rpx 14rpx; border-radius: 16rpx; font-size: 20rpx; }
 
 .head { background: #fff; padding: 24rpx; margin-bottom: 16rpx; }

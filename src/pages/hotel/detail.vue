@@ -1,15 +1,19 @@
 <template>
   <view v-if="item" class="page">
     <view class="hero-wrap">
-      <image class="hero-img" :src="item.cover" mode="aspectFill" />
+      <swiper class="hero-swiper" :indicator-dots="false" :autoplay="true" :interval="4000" :duration="500" :circular="true" @change="onSwipe">
+        <swiper-item v-for="(img, i) in heroImages" :key="i">
+          <image class="hero-img" :src="img" mode="aspectFill" />
+        </swiper-item>
+      </swiper>
       <view class="hero-nav">
         <view class="nav-btn" @click="back">‹</view>
         <view class="nav-right">
-          <view class="nav-btn">⤴</view>
-          <view class="nav-btn">♡</view>
+          <view class="nav-btn" @click="onShare">⤴</view>
+          <view class="nav-btn" :class="{ liked }" @click="toggleLike">{{ liked ? '♥' : '♡' }}</view>
         </view>
       </view>
-      <view class="page-indicator">1/8</view>
+      <view class="page-indicator">{{ heroIndex + 1 }}/{{ heroImages.length }}</view>
     </view>
 
     <view class="head">
@@ -41,19 +45,19 @@
     <view class="section">
       <view class="sec-head">
         <text class="sec-title">入住日期</text>
-        <text class="sec-more">共1晚 ▾</text>
+        <text class="sec-more">共{{ nights }}晚 ▾</text>
       </view>
       <view class="dates">
-        <view class="date-card">
+        <view class="date-card" @click="pickCheckin">
           <text class="d-lbl">入住</text>
-          <text class="d-val">11月15日</text>
-          <text class="d-week">周三</text>
+          <text class="d-val">{{ checkin }}</text>
+          <text class="d-week">{{ weekday(checkin) }}</text>
         </view>
         <text class="arrow">→</text>
-        <view class="date-card">
+        <view class="date-card" @click="pickCheckout">
           <text class="d-lbl">离店</text>
-          <text class="d-val">11月16日</text>
-          <text class="d-week">周四</text>
+          <text class="d-val">{{ checkout }}</text>
+          <text class="d-week">{{ weekday(checkout) }}</text>
         </view>
       </view>
     </view>
@@ -68,10 +72,10 @@
     <view class="section" v-if="item.rooms && item.rooms.length">
       <view class="sec-head">
         <text class="sec-title">房型选择</text>
-        <text class="sec-more">全部房型 ›</text>
+        <text class="sec-more" @click="onMore('全部房型')">全部房型 ›</text>
       </view>
       <view class="room" v-for="(r, i) in item.rooms" :key="i">
-        <image class="r-img" :src="r.cover" mode="aspectFill" />
+        <image class="r-img" :src="r.cover" mode="aspectFill" @click="previewImg([r.cover])" />
         <view class="r-body">
           <text class="r-name">{{ r.name }}</text>
           <text class="r-meta">{{ r.size }} | {{ r.bed }} | {{ r.capacity }}</text>
@@ -81,7 +85,7 @@
           <text class="r-bf">{{ r.breakfast }}</text>
           <view class="r-foot">
             <text class="r-price"><text class="cur">¥{{ r.price }}</text><text class="unit">/晚</text></text>
-            <view class="r-book">预订</view>
+            <view class="r-book" @click="bookRoom(r)">预订</view>
           </view>
         </view>
       </view>
@@ -102,7 +106,7 @@
     <view class="section" v-if="item.reviews && item.reviews.length">
       <view class="sec-head">
         <text class="sec-title">用户评价</text>
-        <text class="sec-more">全部评价 ›</text>
+        <text class="sec-more" @click="onMore('全部评价')">全部评价 ›</text>
       </view>
       <view class="rating-summary" v-if="item.ratings">
         <view class="rs-left">
@@ -128,14 +132,14 @@
         </view>
         <text class="r-content">{{ r.content }}</text>
         <view v-if="r.images && r.images.length" class="r-imgs">
-          <image v-for="(img, j) in r.images" :key="j" :src="img" class="r-imgi" mode="aspectFill" />
+          <image v-for="(img, j) in r.images" :key="j" :src="img" class="r-imgi" mode="aspectFill" @click="previewImg(r.images, j)" />
         </view>
       </view>
     </view>
 
     <view class="footer">
       <text class="f-price"><text class="cur">¥{{ item.price }}</text><text class="unit">/晚起</text></text>
-      <view class="f-ic">🎧</view>
+      <view class="f-ic" @click="onService">🎧</view>
       <view class="f-book" @click="book">立即预订</view>
     </view>
     <view style="height: 140rpx"></view>
@@ -145,9 +149,30 @@
 <script setup>
 import { hotels, findById } from '@/common/data.js'
 import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const item = ref(null)
+const heroIndex = ref(0)
+const liked = ref(false)
+const today = new Date()
+const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1)
+const fmt = (d) => `${d.getMonth()+1}月${d.getDate()}日`
+const checkin = ref(fmt(today))
+const checkout = ref(fmt(tomorrow))
+const nights = ref(1)
+const heroImages = computed(() => {
+  if (!item.value) return []
+  const c = item.value.cover
+  return [c,
+    'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&q=70',
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=70',
+    'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800&q=70',
+    'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=70',
+    'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=70',
+    'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&q=70',
+    'https://images.unsplash.com/photo-1551776235-dde6d482980b?w=800&q=70']
+})
+
 onLoad((q) => { item.value = findById(hotels, q.id) || hotels[4] })
 
 function tagIcon (t) {
@@ -155,17 +180,49 @@ function tagIcon (t) {
   return map[t] || ''
 }
 function facColor (i) { return ['c-blue', 'c-orange', 'c-purple', 'c-pink', 'c-green', 'c-blue', 'c-orange', 'c-purple'][i % 8] }
+function weekday (s) {
+  const m = /(\d+)月(\d+)日/.exec(s); if (!m) return ''
+  const d = new Date(today.getFullYear(), +m[1]-1, +m[2])
+  return ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()]
+}
 function back () { uni.navigateBack({ fail: () => uni.reLaunch({ url: '/pages/hotel/list' }) }) }
-function book () { uni.showToast({ title: '预订成功（演示）', icon: 'success' }) }
+function book () { uni.showToast({ title: `已预订 ${checkin.value} - ${checkout.value}`, icon: 'success' }) }
+function bookRoom (r) { uni.showToast({ title: `预订成功：${r.name}`, icon: 'success' }) }
+function onSwipe (e) { heroIndex.value = e.detail.current }
+function toggleLike () { liked.value = !liked.value; uni.showToast({ title: liked.value ? '已收藏' : '取消收藏', icon: 'none' }) }
+function onShare () { uni.showActionSheet({ itemList: ['微信好友','朋友圈','复制链接'], success: () => uni.showToast({ title: '分享成功', icon: 'success' }) }) }
+function pickCheckin () {
+  uni.showActionSheet({ itemList: ['今天','明天','后天','3天后','7天后'], success: (e) => {
+    const off = [0,1,2,3,7][e.tapIndex]
+    const d = new Date(today); d.setDate(today.getDate() + off)
+    checkin.value = fmt(d)
+    const co = new Date(d); co.setDate(d.getDate() + nights.value)
+    checkout.value = fmt(co)
+  } })
+}
+function pickCheckout () {
+  uni.showActionSheet({ itemList: ['1晚','2晚','3晚','5晚'], success: (e) => {
+    const n = [1,2,3,5][e.tapIndex]; nights.value = n
+    const m = /(\d+)月(\d+)日/.exec(checkin.value)
+    const ci = m ? new Date(today.getFullYear(), +m[1]-1, +m[2]) : new Date(today)
+    const co = new Date(ci); co.setDate(ci.getDate() + n)
+    checkout.value = fmt(co)
+  } })
+}
+function previewImg (urls, i) { uni.previewImage({ urls, current: urls[i || 0] }) }
+function onMore (name) { uni.showToast({ title: `加载${name}`, icon: 'none' }) }
+function onService () { uni.showToast({ title: '正在接通客服…', icon: 'none' }) }
 </script>
 
 <style lang="scss" scoped>
 .page { background: #F3F4F6; min-height: 100vh; }
 .hero-wrap { position: relative; height: 480rpx; }
+.hero-swiper { width: 100%; height: 100%; }
 .hero-img { width: 100%; height: 100%; display: block; }
-.hero-nav { position: absolute; top: env(safe-area-inset-top); left: 0; right: 0; display: flex; justify-content: space-between; padding: 20rpx 24rpx; }
+.hero-nav { position: absolute; top: env(safe-area-inset-top); left: 0; right: 0; display: flex; justify-content: space-between; padding: 20rpx 24rpx; z-index: 2; }
 .nav-right { display: flex; gap: 16rpx; }
 .nav-btn { width: 60rpx; height: 60rpx; border-radius: 50%; background: rgba(255,255,255,.85); display: flex; align-items: center; justify-content: center; font-size: 32rpx; color: #1F2937; }
+.nav-btn.liked { color: #DC2626; }
 .page-indicator { position: absolute; bottom: 20rpx; right: 24rpx; background: rgba(0,0,0,.5); color: #fff; padding: 4rpx 14rpx; border-radius: 16rpx; font-size: 20rpx; }
 
 .head { background: #fff; padding: 24rpx; margin-bottom: 16rpx; }

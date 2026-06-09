@@ -10,17 +10,17 @@
             <text class="brand-cn">一江津彩</text>
           </view>
         </view>
-        <view class="search">
+        <view class="search" @click="onSearch">
           <text class="ic">🔍</text>
           <text class="ph">搜索景点、美食、线路</text>
         </view>
-        <view class="more">⋮</view>
-        <view class="user">👤</view>
+        <view class="more" @click="onMore">⋮</view>
+        <view class="user" @click="onUser">👤</view>
       </view>
     </view>
 
     <!-- Banner 融媒贴片 -->
-    <view class="banner">
+    <view class="banner" @click="onBanner">
       <text class="banner-title">融媒贴片</text>
       <text class="banner-sub">— 江津彩在江津</text>
     </view>
@@ -34,7 +34,7 @@
     </view>
 
     <!-- 江津风物地图导览 -->
-    <view class="map-card">
+    <view class="map-card" @click="onMap">
       <text class="map-title">江津风物地图导览</text>
     </view>
 
@@ -45,14 +45,14 @@
           <text class="welfare-title">工会福利汇</text>
           <text class="welfare-sub">好物线上线下随心兑</text>
         </view>
-        <view class="welfare-go">GO</view>
+        <view class="welfare-go" @click="onWelfare">GO</view>
       </view>
       <view class="welfare-row">
-        <view class="welfare-card">
+        <view class="welfare-card" @click="onWelfareCard('重百超市')">
           <text class="wc-title">重百超市</text>
           <text class="wc-sub">全城门店通用</text>
         </view>
-        <view class="welfare-card">
+        <view class="welfare-card" @click="onWelfareCard('天猫超市')">
           <text class="wc-title">天猫超市</text>
           <text class="wc-sub">直接配送到家</text>
         </view>
@@ -64,16 +64,16 @@
       <view class="member-head">
         <text class="member-title">会员推荐</text>
         <text class="member-sub">尽享江津风物珍馐/漫游江津山水珍味</text>
-        <view class="member-more">更多 <text class="arrow">›</text></view>
+        <view class="member-more" @click="goCulturalList">更多 <text class="arrow">›</text></view>
       </view>
       <scroll-view scroll-x class="tabs">
-        <view class="tab" v-for="(t, i) in memberTabs" :key="i" :class="{ active: i === 0 }">{{ t }}</view>
+        <view class="tab" v-for="(t, i) in memberTabs" :key="i" :class="{ active: i === activeMemberTab }" @click="activeMemberTab = i">{{ t }}</view>
       </scroll-view>
       <scroll-view scroll-x class="products">
         <view class="product" v-for="(p, i) in products" :key="i" @click="goCultural(p.id)">
           <image class="p-img" :src="p.cover" mode="aspectFill" />
           <view class="p-info">
-            <text class="p-name">商品名称</text>
+            <text class="p-name">{{ p.shortTitle || p.title }}</text>
             <text class="p-price">¥{{ p.price }}</text>
           </view>
         </view>
@@ -90,6 +90,9 @@
 <script setup>
 import { cultural } from '@/common/data.js'
 import TabBar from '@/components/TabBar.vue'
+import { ref } from 'vue'
+
+const activeMemberTab = ref(0)
 
 const icons = [
   { key: 'taste', emoji: '🍜', label: '寻味江津' },
@@ -113,16 +116,40 @@ function onIcon (it) {
     hotel: '/pages/hotel/list',
     cultural: '/pages/cultural/list',
     guide: '/pages/guide/list',
-    taste: '/pages/cultural/list',
-    heritage: '/pages/cultural/list',
-    goods: '/pages/cultural/list',
-    specialty: '/pages/cultural/list',
+    taste: '/pages/cultural/list?cat=食',
+    heritage: '/pages/cultural/list?cat=非遗',
+    goods: '/pages/cultural/list?cat=好物',
+    specialty: '/pages/cultural/list?cat=乡珍',
     shop: '/pages/cultural/list'
   }
   uni.navigateTo({ url: map[it.key] || '/pages/cultural/list' })
 }
 function goCultural (id) {
   uni.navigateTo({ url: `/pages/cultural/detail?id=${id}` })
+}
+function goCulturalList () {
+  uni.navigateTo({ url: '/pages/cultural/list' })
+}
+function onSearch () {
+  uni.showToast({ title: '搜索功能开发中', icon: 'none' })
+}
+function onMore () {
+  uni.showActionSheet({ itemList: ['扫一扫', '收藏', '消息', '设置'], success: (e) => uni.showToast({ title: '已选择：' + ['扫一扫','收藏','消息','设置'][e.tapIndex], icon: 'none' }) })
+}
+function onUser () {
+  uni.showToast({ title: '请先登录', icon: 'none' })
+}
+function onBanner () {
+  uni.navigateTo({ url: '/pages/guide/list' })
+}
+function onMap () {
+  uni.showToast({ title: '地图导览开发中', icon: 'none' })
+}
+function onWelfare () {
+  uni.navigateTo({ url: '/pages/cultural/list' })
+}
+function onWelfareCard (name) {
+  uni.showToast({ title: `进入${name}（演示）`, icon: 'none' })
 }
 </script>
 
@@ -150,6 +177,7 @@ function goCultural (id) {
 .banner {
   margin: 16rpx 24rpx 24rpx; background: #ECEEF2; border-radius: 24rpx;
   height: 280rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12rpx;
+  &:active { background: #DDE1E7; }
   .banner-title { font-size: 44rpx; font-weight: 700; color: #1F2937; letter-spacing: 4rpx; }
   .banner-sub { font-size: 30rpx; color: #1F2937; }
 }
@@ -159,9 +187,11 @@ function goCultural (id) {
   display: grid; grid-template-columns: repeat(5, 1fr); gap: 24rpx 0; padding: 16rpx 0 24rpx;
   .cell {
     display: flex; flex-direction: column; align-items: center; gap: 12rpx;
+    &:active .cell-ic { background: #D1D5DB; }
     .cell-ic {
       width: 96rpx; height: 96rpx; border-radius: 50%; background: #E5E7EB;
       display: flex; align-items: center; justify-content: center; font-size: 40rpx;
+      transition: background .15s;
     }
     .cell-label { font-size: 24rpx; color: #1F2937; }
   }
@@ -170,6 +200,7 @@ function goCultural (id) {
 .map-card {
   margin: 8rpx 24rpx 24rpx; background: #ECEEF2; border-radius: 24rpx;
   height: 220rpx; display: flex; align-items: center; justify-content: center;
+  &:active { background: #DDE1E7; }
   .map-title { font-size: 36rpx; font-weight: 700; color: #1F2937; }
 }
 
